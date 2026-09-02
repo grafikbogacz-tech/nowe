@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generator rachunków — umowa o dzieło / zlecenie</title>
+<style>
+:root{
+  --bg:#f4f5f7;
+  --panel:#ffffff;
+  --ink:#1c1f24;
+  --muted:#5c6673;
+  --line:#d8dde3;
+  --line-soft:#eaeef2;
+  --accent:#1f5f8b;
+  --accent-ink:#ffffff;
+  --warn:#8a5a00;
+  --warn-bg:#fff6e0;
+  --radius:8px;
+  --space:16px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- Layout ---------- */
+
+.app{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:var(--space);
+  max-width:1400px;
+  margin:0 auto;
+  padding:var(--space);
+}
+
+@media (min-width:1080px){
+  .app{grid-template-columns:minmax(380px,440px) 1fr;align-items:start}
+  .panel{position:sticky;top:var(--space);max-height:calc(100vh - 2*var(--space));overflow-y:auto}
+}
+
+/* ---------- Panel formularza ---------- */
+
+.panel{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:var(--space);
+}
+
+.panel h1{
+  margin:0 0 4px;
+  font-size:1.125rem;
+  letter-spacing:-.01em;
+}
+
+.panel .lede{
+  margin:0 0 var(--space);
+  color:var(--muted);
+  font-size:.875rem;
+}
+
+fieldset{
+  border:0;
+  border-top:1px solid var(--line-soft);
+  margin:24px 0 0;
+  padding:20px 0 0;
+}
+
+fieldset:first-of-type{margin-top:0;border-top:0;padding-top:0}
+
+legend{
+  display:block;
+  margin-bottom:4px;
+  padding:0;
+  font-size:.75rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:var(--muted);
+}
+
+.field{margin-top:12px}
+
+.field label,
+.field .label{
+  display:block;
+  margin-bottom:4px;
+  font-size:.8125rem;
+  font-weight:600;
+}
+
+.field .hint{
+  margin-top:4px;
+  font-size:.75rem;
+  color:var(--muted);
+}
+
+input,select,textarea{
+  width:100%;
+  padding:9px 10px;
+  border:1px solid var(--line);
+  border-radius:6px;
+  background:#fff;
+  color:inherit;
+  font:inherit;
+  font-size:.9375rem;
+}
+
+textarea{min-height:72px;resize:vertical}
+
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.check{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  margin-top:12px;
+}
+
+.check input{width:auto;margin-top:3px;flex:0 0 auto}
+
+.check label{margin:0;font-weight:600;font-size:.8125rem}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:var(--space);
+  padding-top:var(--space);
+  border-top:1px solid var(--line-soft);
+}
+
+button{
+  padding:10px 14px;
+  border:1px solid var(--line);
+  border-radius:6px;
+  background:#fff;
+  color:inherit;
+  font:inherit;
+  font-size:.875rem;
+  font-weight:600;
+  cursor:pointer;
+}
+
+button:hover{background:var(--line-soft)}
+
+button.primary{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:var(--accent-ink);
+}
+
+button.primary:hover{filter:brightness(1.1)}
+
+.note{
+  margin-top:var(--space);
+  padding:10px 12px;
+  border-radius:6px;
+  background:var(--warn-bg);
+  color:var(--warn);
+  font-size:.8125rem;
+}
+
+/* ---------- Dokument ---------- */
+
+.doc-wrap{display:flex;justify-content:center}
+
+.doc{
+  display:flex;
+  flex-direction:column;
+  width:100%;
+  max-width:210mm;
+  min-height:297mm;
+  padding:18mm 16mm;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  color:#000;
+  font-family:"Times New Roman",Georgia,serif;
+  font-size:11pt;
+  line-height:1.45;
+}
+
+.doc-head{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:8px;
+  margin-bottom:10mm;
+}
+
+.doc-head h2{
+  margin:0;
+  font-size:16pt;
+  letter-spacing:.02em;
+}
+
+.doc-place{font-size:10pt;text-align:right}
+
+.parties{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10mm;
+  margin-bottom:8mm;
+}
+
+.party h3{
+  margin:0 0 3mm;
+  font-size:9pt;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+
+.party p{margin:0;white-space:pre-line}
+
+.contract{margin-bottom:6mm}
+
+.contract p{margin:0 0 2mm}
+
+.subject{margin-bottom:8mm}
+
+.subject h3{
+  margin:0 0 2mm;
+  font-size:9pt;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+
+.subject p{margin:0;white-space:pre-line}
+
+table.calc{
+  width:100%;
+  border-collapse:collapse;
+  margin-bottom:6mm;
+}
+
+table.calc th,
+table.calc td{
+  padding:2.5mm 3mm;
+  border:1px solid #000;
+  text-align:left;
+  vertical-align:top;
+}
+
+table.calc td.num{
+  width:38mm;
+  text-align:right;
+  white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+
+table.calc tr.total th,
+table.calc tr.total td{font-weight:700}
+
+.words{margin-bottom:8mm}
+
+.payment{margin-bottom:14mm}
+
+.payment p{margin:0 0 2mm}
+
+.signs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14mm;
+  margin-top:auto;
+  padding-top:10mm;
+}
+
+.sign{
+  padding-top:2mm;
+  border-top:1px solid #000;
+  font-size:9pt;
+  text-align:center;
+}
+
+.muted-doc{color:#555}
+
+/* ---------- Druk ---------- */
+
+@page{size:A4;margin:15mm}
+
+@media print{
+  body{background:#fff}
+  .app{display:block;max-width:none;margin:0;padding:0}
+  .panel,.screen-only{display:none !important}
+  .doc-wrap{display:block}
+  .doc{
+    max-width:none;
+    width:auto;
+    min-height:0;
+    padding:0;
+    border:0;
+    border-radius:0;
+  }
+  .signs{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ FORMULARZ ============ -->
+  <form class="panel screen-only" id="form" autocomplete="off">
+    <h1>Generator rachunków</h1>
+    <p class="lede">Umowa o dzieło / zlecenia bez składek ZUS. Wypełnij pola — dokument obok aktualizuje się na bieżąco.</p>
+
+    <fieldset>
+      <legend>Rachunek</legend>
+      <div class="row">
+        <div class="field">
+          <label for="nr">Numer rachunku</label>
+          <input id="nr" name="nr" type="text">
+        </div>
+        <div class="field">
+          <label for="dataWyst">Data wystawienia</label>
+          <input id="dataWyst" name="dataWyst" type="date">
+        </div>
+      </div>
+      <div class="field">
+        <label for="miejscowosc">Miejscowość</label>
+        <input id="miejscowosc" name="miejscowosc" type="text">
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Zleceniodawca (płatnik)</legend>
+      <div class="field">
+        <label for="zdNazwa">Nazwa</label>
+        <input id="zdNazwa" name="zdNazwa" type="text">
+      </div>
+      <div class="field">
+        <label for="zdAdres">Adres</label>
+        <textarea id="zdAdres" name="zdAdres" rows="2"></textarea>
+      </div>
+      <div class="field">
+        <label for="zdNip">NIP</label>
+        <input id="zdNip" name="zdNip" type="text" inputmode="numeric">
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Wykonawca</legend>
+      <div class="field">
+        <label for="wkNazwa">Imię i nazwisko</label>
+        <input id="wkNazwa" name="wkNazwa" type="text">
+      </div>
+      <div class="field">
+        <label for="wkAdres">Adres</label>
+        <textarea id="wkAdres" name="wkAdres" rows="2"></textarea>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="wkPesel">PESEL</label>
+          <input id="wkPesel" name="wkPesel" type="text" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="wkUs">Urząd skarbowy</label>
+          <input id="wkUs" name="wkUs" type="text">
+        </div>
+      </div>
+      <div class="field">
+        <label for="wkKonto">Numer konta</label>
+        <input id="wkKonto" name="wkKonto" type="text" inputmode="numeric">
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Umowa</legend>
+      <div class="field">
+        <label for="umowaTyp">Rodzaj umowy</label>
+        <select id="umowaTyp" name="umowaTyp">
+          <option value="o dzieło">umowa o dzieło</option>
+          <option value="zlecenia">umowa zlecenia</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="umowaNr">Numer umowy</label>
+          <input id="umowaNr" name="umowaNr" type="text">
+        </div>
+        <div class="field">
+          <label for="umowaData">Data umowy</label>
+          <input id="umowaData" name="umowaData" type="date">
+        </div>
+      </div>
+      <div class="field">
+        <label for="przedmiot">Przedmiot umowy / opis wykonanych prac</label>
+        <textarea id="przedmiot" name="przedmiot" rows="3"></textarea>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Kwoty</legend>
+      <div class="field">
+        <label for="brutto">Kwota brutto (zł)</label>
+        <input id="brutto" name="brutto" type="text" inputmode="decimal" placeholder="np. 3000,00">
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="kup">Koszty uzyskania przychodu</label>
+          <select id="kup" name="kup">
+            <option value="20">20%</option>
+            <option value="50">50%</option>
+            <option value="0">0% (brak)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="stawkaPit">Stawka zaliczki PIT (%)</label>
+          <input id="stawkaPit" name="stawkaPit" type="text" inputmode="decimal">
+          <p class="hint">Sprawdź aktualną stawkę.</p>
+        </div>
+      </div>
+      <div class="check">
+        <input id="pitZero" name="pitZero" type="checkbox">
+        <label for="pitZero">Zwolnienie z zaliczki PIT (np. ulga dla osób do 26 lat) — zaliczka = 0 zł</label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Płatność</legend>
+      <div class="field">
+        <label for="sposob">Sposób zapłaty</label>
+        <select id="sposob" name="sposob">
+          <option value="przelew">przelew na wskazany rachunek bankowy</option>
+          <option value="gotowka">gotówką</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="termin">Termin płatności</label>
+        <input id="termin" name="termin" type="date">
+      </div>
+    </fieldset>
+
+    <div class="actions">
+      <button type="button" class="primary" id="btnPrint">Wydrukuj / Zapisz PDF</button>
+      <button type="button" id="btnNew">Nowy rachunek</button>
+      <button type="button" id="btnClear">Wyczyść wszystko</button>
+    </div>
+
+    <p class="note">
+      Generator wykonuje obliczenia na podstawie stawek, które wpisujesz powyżej — nie zastępuje księgowości.
+      Zaokrąglenia: podstawa opodatkowania i zaliczka na podatek do pełnych złotych.
+      Ulga dla osób do 26 lat ma roczny limit przychodu — pilnuj go poza generatorem.
+    </p>
+    <p class="note" id="storageNote" hidden>
+      Przeglądarka nie pozwala zapisać danych lokalnie, więc pola nie zostaną zapamiętane po zamknięciu.
+      Wrzuć plik na serwer/domenę, jeśli chcesz, żeby zapamiętywał dane.
+    </p>
+  </form>
+
+  <!-- ============ DOKUMENT ============ -->
+  <div class="doc-wrap">
+    <article class="doc" id="doc" aria-live="polite">
+
+      <header class="doc-head">
+        <h2>RACHUNEK <span data-out="nr"></span></h2>
+        <div class="doc-place">
+          <div data-out="miejscowosc"></div>
+          <div data-out="dataWyst"></div>
+        </div>
+      </header>
+
+      <div class="parties">
+        <section class="party">
+          <h3>Zleceniodawca</h3>
+          <p data-out="zleceniodawca"></p>
+        </section>
+        <section class="party">
+          <h3>Wykonawca</h3>
+          <p data-out="wykonawca"></p>
+        </section>
+      </div>
+
+      <div class="contract">
+        <p data-out="umowaOpis"></p>
+      </div>
+
+      <section class="subject">
+        <h3>Przedmiot umowy</h3>
+        <p data-out="przedmiot"></p>
+      </section>
+
+      <table class="calc">
+        <tbody>
+          <tr>
+            <th scope="row">Kwota brutto (wynagrodzenie)</th>
+            <td class="num" data-out="mBrutto"></td>
+          </tr>
+          <tr>
+            <th scope="row" data-out="lblKup">Koszty uzyskania przychodu</th>
+            <td class="num" data-out="mKup"></td>
+          </tr>
+          <tr>
+            <th scope="row">Podstawa opodatkowania</th>
+            <td class="num" data-out="mPodstawa"></td>
+          </tr>
+          <tr>
+            <th scope="row" data-out="lblPit">Zaliczka na podatek dochodowy</th>
+            <td class="num" data-out="mPit"></td>
+          </tr>
+          <tr class="total">
+            <th scope="row">Do wypłaty</th>
+            <td class="num" data-out="mNetto"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="words">Słownie: <strong data-out="slownie"></strong></p>
+
+      <section class="payment">
+        <p data-out="sposobOpis"></p>
+        <p data-out="terminOpis"></p>
+        <p data-out="kontoOpis"></p>
+      </section>
+
+      <div class="signs">
+        <div class="sign">Wykonawca</div>
+        <div class="sign">Zleceniodawca / zatwierdził</div>
+      </div>
+
+    </article>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var form = document.getElementById('form');
+  var STORE_KEY = 'rachunek.v1';
+
+  /* ---------- Pieniądze: wszystko w groszach (liczby całkowite) ---------- */
+
+  function parseMoney(value){
+    if(!value) return 0;
+    var clean = String(value).replace(/\s/g,'').replace(',', '.').replace(/[^0-9.\-]/g,'');
+    var num = parseFloat(clean);
+    if(!isFinite(num) || num < 0) return 0;
+    return Math.round(num * 100);
+  }
+
+  function parseRate(value){
+    var num = parseFloat(String(value || '').replace(',', '.'));
+    if(!isFinite(num) || num < 0) return 0;
+    return num;
+  }
+
+  var fmt = new Intl.NumberFormat('pl-PL', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  function money(grosze){
+    return fmt.format(grosze / 100) + ' zł';
+  }
+
+  /* ---------- Kwota słownie ---------- */
+
+  var ONES  = ['','jeden','dwa','trzy','cztery','pięć','sześć','siedem','osiem','dziewięć'];
+  var TEENS = ['dziesięć','jedenaście','dwanaście','trzynaście','czternaście','piętnaście','szesnaście','siedemnaście','osiemnaście','dziewiętnaście'];
+  var TENS  = ['','','dwadzieścia','trzydzieści','czterdzieści','pięćdziesiąt','sześćdziesiąt','siedemdziesiąt','osiemdziesiąt','dziewięćdziesiąt'];
+  var HUNDREDS = ['','sto','dwieście','trzysta','czterysta','pięćset','sześćset','siedemset','osiemset','dziewięćset'];
+  var GROUPS = [
+    null,
+    ['tysiąc','tysiące','tysięcy'],
+    ['milion','miliony','milionów'],
+    ['miliard','miliardy','miliardów']
+  ];
+
+  function plural(n, one, few, many){
+    var d = n % 10, c = n % 100;
+    if(n === 1) return one;
+    if(d >= 2 && d <= 4 && !(c >= 12 && c <= 14)) return few;
+    return many;
+  }
+
+  function tripletToWords(n){
+    var out = [];
+    var h = Math.floor(n / 100);
+    var rest = n % 100;
+    if(h) out.push(HUNDREDS[h]);
+    if(rest >= 10 && rest <= 19){
+      out.push(TEENS[rest - 10]);
+    } else {
+      var t = Math.floor(rest / 10);
+      var o = rest % 10;
+      if(t) out.push(TENS[t]);
+      if(o) out.push(ONES[o]);
+    }
+    return out.join(' ');
+  }
+
+  function intToWords(n){
+    if(n === 0) return 'zero';
+    var triplets = [];
+    while(n > 0){
+      triplets.push(n % 1000);
+      n = Math.floor(n / 1000);
+    }
+    var parts = [];
+    for(var i = triplets.length - 1; i >= 0; i--){
+      var t = triplets[i];
+      if(!t) continue;
+      var words = tripletToWords(t);
+      if(i === 0){
+        parts.push(words);
+      } else {
+        var g = GROUPS[i];
+        if(!g){ parts.push(words); continue; }
+        // "jeden tysiąc" skraca się do "tysiąc"
+        if(t === 1) parts.push(g[0]);
+        else parts.push(words + ' ' + plural(t, g[0], g[1], g[2]));
+      }
+    }
+    return parts.join(' ');
+  }
+
+  function moneyToWords(grosze){
+    var zl = Math.floor(grosze / 100);
+    var gr = grosze % 100;
+    var text = intToWords(zl) + ' ' + plural(zl, 'złoty', 'złote', 'złotych');
+    text += ' ' + (gr < 10 ? '0' + gr : gr) + '/100';
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
+  /* ---------- Pomocnicze ---------- */
+
+  function val(name){
+    var el = form.elements[name];
+    if(!el) return '';
+    return el.type === 'checkbox' ? el.checked : el.value.trim();
+  }
+
+  function formatDate(iso){
+    if(!iso) return '';
+    var p = iso.split('-');
+    return p.length === 3 ? p[2] + '.' + p[1] + '.' + p[0] : iso;
+  }
+
+  function joinLines(){
+    var out = [];
+    for(var i = 0; i < arguments.length; i++){
+      if(arguments[i]) out.push(arguments[i]);
+    }
+    return out.join('\n');
+  }
+
+  var outputs = {};
+  Array.prototype.forEach.call(document.querySelectorAll('[data-out]'), function(el){
+    outputs[el.getAttribute('data-out')] = el;
+  });
+
+  function put(key, text){
+    if(outputs[key]) outputs[key].textContent = text || '';
+  }
+
+  /* ---------- Obliczenia + render ---------- */
+
+  function render(){
+    var brutto = parseMoney(val('brutto'));
+    var kupPct = parseRate(val('kup'));
+    var pitPct = parseRate(val('stawkaPit'));
+    var pitZero = val('pitZero') === true;
+
+    var kup = Math.round(brutto * kupPct / 100);
+    var podstawaRaw = Math.max(0, brutto - kup);
+
+    // Podstawa opodatkowania zaokrąglana do pełnych złotych.
+    var podstawaZl = Math.round(podstawaRaw / 100);
+    var podstawa = podstawaZl * 100;
+
+    // Zaliczka na podatek również do pełnych złotych.
+    var pitZl = pitZero ? 0 : Math.round(podstawaZl * pitPct / 100);
+    var pit = pitZl * 100;
+
+    var netto = Math.max(0, brutto - pit);
+
+    put('mBrutto', money(brutto));
+    put('mKup', money(kup));
+    put('mPodstawa', money(podstawa));
+    put('mPit', money(pit));
+    put('mNetto', money(netto));
+    put('slownie', moneyToWords(netto));
+
+    put('lblKup', 'Koszty uzyskania przychodu (' + fmt.format(kupPct).replace(',00','') + '%)');
+    put('lblPit', pitZero
+      ? 'Zaliczka na podatek dochodowy (zwolnienie)'
+      : 'Zaliczka na podatek dochodowy (' + fmt.format(pitPct).replace(',00','') + '%)');
+
+    // Nagłówek
+    var nr = val('nr');
+    put('nr', nr ? 'nr ' + nr : '');
+    put('miejscowosc', val('miejscowosc'));
+    var dw = formatDate(val('dataWyst'));
+    put('dataWyst', dw ? 'data wystawienia: ' + dw : '');
+
+    // Strony
+    put('zleceniodawca', joinLines(val('zdNazwa'), val('zdAdres'), val('zdNip') ? 'NIP: ' + val('zdNip') : ''));
+    put('wykonawca', joinLines(
+      val('wkNazwa'),
+      val('wkAdres'),
+      val('wkPesel') ? 'PESEL: ' + val('wkPesel') : '',
+      val('wkUs') ? 'Urząd skarbowy: ' + val('wkUs') : ''
+    ));
+
+    // Umowa
+    var typ = val('umowaTyp');
+    var opis = 'Rachunek do umowy ' + typ;
+    if(val('umowaNr')) opis += ' nr ' + val('umowaNr');
+    if(val('umowaData')) opis += ' z dnia ' + formatDate(val('umowaData'));
+    put('umowaOpis', opis);
+    put('przedmiot', val('przedmiot'));
+
+    // Płatność
+    var sposob = val('sposob');
+    put('sposobOpis', 'Sposób zapłaty: ' + (sposob === 'gotowka' ? 'gotówką' : 'przelew na wskazany rachunek bankowy'));
+    put('terminOpis', val('termin') ? 'Termin płatności: ' + formatDate(val('termin')) : '');
+    put('kontoOpis', (sposob !== 'gotowka' && val('wkKonto')) ? 'Nr rachunku: ' + val('wkKonto') : '');
+
+    save();
+  }
+
+  /* ---------- Zapis lokalny (best effort) ---------- */
+
+  var storageOk = true;
+
+  function save(){
+    if(!storageOk) return;
+    try{
+      var data = {};
+      Array.prototype.forEach.call(form.elements, function(el){
+        if(!el.name) return;
+        data[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+      });
+      localStorage.setItem(STORE_KEY, JSON.stringify(data));
+    }catch(e){
+      storageOk = false;
+      var note = document.getElementById('storageNote');
+      if(note) note.hidden = false;
+    }
+  }
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(STORE_KEY);
+      if(!raw) return false;
+      var data = JSON.parse(raw);
+      Object.keys(data).forEach(function(name){
+        var el = form.elements[name];
+        if(!el) return;
+        if(el.type === 'checkbox') el.checked = !!data[name];
+        else el.value = data[name];
+      });
+      return true;
+    }catch(e){
+      storageOk = false;
+      return false;
+    }
+  }
+
+  /* ---------- Wartości domyślne ---------- */
+
+  function today(){
+    var d = new Date();
+    var m = d.getMonth() + 1;
+    var day = d.getDate();
+    return d.getFullYear() + '-' + (m < 10 ? '0' + m : m) + '-' + (day < 10 ? '0' + day : day);
+  }
+
+  function setDefaults(){
+    form.elements.dataWyst.value = today();
+    form.elements.nr.value = '1/' + new Date().getFullYear();
+    form.elements.stawkaPit.value = '12';
+    form.elements.kup.value = '20';
+  }
+
+  /* ---------- Akcje ---------- */
+
+  document.getElementById('btnPrint').addEventListener('click', function(){
+    window.print();
+  });
+
+  document.getElementById('btnNew').addEventListener('click', function(){
+    // Zwiększa pierwszą liczbę w numerze: "3/2026" -> "4/2026"
+    form.elements.nr.value = form.elements.nr.value.replace(/\d+/, function(n){
+      return String(parseInt(n, 10) + 1);
+    });
+    form.elements.przedmiot.value = '';
+    form.elements.brutto.value = '';
+    form.elements.dataWyst.value = today();
+    form.elements.termin.value = '';
+    render();
+    form.elements.przedmiot.focus();
+  });
+
+  document.getElementById('btnClear').addEventListener('click', function(){
+    if(!window.confirm('Wyczyścić wszystkie pola, także dane zleceniodawcy i wykonawcy?')) return;
+    form.reset();
+    try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+    setDefaults();
+    render();
+  });
+
+  form.addEventListener('input', render);
+  form.addEventListener('change', render);
+
+  if(!load()) setDefaults();
+  render();
+})();
+</script>
+
+</body>
+</html>
