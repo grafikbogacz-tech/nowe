@@ -54,6 +54,18 @@ body{
 
 .panel > h1{margin:0 0 12px;font-size:1.0625rem;letter-spacing:-.01em}
 
+.ver{
+  display:inline-block;
+  margin-left:6px;
+  padding:2px 7px;
+  border-radius:99px;
+  background:var(--ok-bg);
+  color:var(--ok);
+  font-size:.6875rem;
+  font-weight:600;
+  vertical-align:middle;
+}
+
 /* ---------- Zakładki ---------- */
 
 .tabs{
@@ -379,7 +391,7 @@ table.items-table .c-val{width:28mm;text-align:right;white-space:nowrap}
 <div class="app">
 
   <div class="panel screen-only">
-    <h1>Generator rachunków</h1>
+    <h1>Generator rachunków <span class="ver">wersja 3 — z bazą Excel</span></h1>
 
     <div class="tabs" role="tablist" aria-label="Sekcje generatora">
       <button type="button" role="tab" id="tab-rachunek" aria-controls="p-rachunek" aria-selected="true">Rachunek</button>
@@ -1679,10 +1691,25 @@ table.items-table .c-val{width:28mm;text-align:right;white-space:nowrap}
     return s;
   }
 
+  function normalizuj(t){
+    return String(t || '').trim().toLowerCase()
+      .replace(/ł/g, 'l')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  // Dopasowanie nazwy arkusza niewrażliwe na wielkość liter, spacje i polskie znaki.
+  function znajdzArkusz(arkusze, nazwa){
+    var cel = normalizuj(nazwa), klucze = Object.keys(arkusze);
+    for(var i = 0; i < klucze.length; i++){
+      if(normalizuj(klucze[i]) === cel) return arkusze[klucze[i]];
+    }
+    return null;
+  }
+
   function wczytajZArkuszy(arkusze){
     var podsumowanie = {klienci:0, uslugi:0, rejestr:0, ustawienia:0};
 
-    var u = arkusze[ARKUSZE.ustawienia];
+    var u = znajdzArkusz(arkusze, ARKUSZE.ustawienia);
     if(u){
       u.slice(1).forEach(function(w){
         var klucz = POLA_USTAWIEN[String(w[0] || '').trim()];
@@ -1694,7 +1721,7 @@ table.items-table .c-val{width:28mm;text-align:right;white-space:nowrap}
       });
     }
 
-    var k = arkusze[ARKUSZE.klienci];
+    var k = znajdzArkusz(arkusze, ARKUSZE.klienci);
     if(k){
       db.klienci = k.slice(1).filter(function(w){ return w[0]; }).map(function(w){
         return {nazwa:String(w[0]), adres:String(w[1] || ''), nip:String(w[2] || 'Brak'), kraj:String(w[3] || 'PL')};
@@ -1702,7 +1729,7 @@ table.items-table .c-val{width:28mm;text-align:right;white-space:nowrap}
       podsumowanie.klienci = db.klienci.length;
     }
 
-    var s = arkusze[ARKUSZE.uslugi];
+    var s = znajdzArkusz(arkusze, ARKUSZE.uslugi);
     if(s){
       db.uslugi = s.slice(1).filter(function(w){ return w[0]; }).map(function(w){
         return {nazwa:String(w[0]), cena:toNumber(w[1]), jednostka:String(w[2] || 'szt.')};
@@ -1710,7 +1737,7 @@ table.items-table .c-val{width:28mm;text-align:right;white-space:nowrap}
       podsumowanie.uslugi = db.uslugi.length;
     }
 
-    var r = arkusze[ARKUSZE.rejestr];
+    var r = znajdzArkusz(arkusze, ARKUSZE.rejestr);
     if(r){
       db.rejestr = r.slice(1).filter(function(w){ return w[0]; }).map(function(w){
         return {
@@ -1729,7 +1756,13 @@ table.items-table .c-val{width:28mm;text-align:right;white-space:nowrap}
     }
 
     if(!u && !k && !s && !r){
-      throw new Error('W pliku nie ma arkuszy Ustawienia / Klienci / Usługi / Baza Rachunków.');
+      var znalezione = Object.keys(arkusze);
+      throw new Error(
+        'nie ma w nim arkuszy Ustawienia / Klienci / Usługi / Baza Rachunków. ' +
+        (znalezione.length
+          ? 'Arkusze w tym pliku: ' + znalezione.join(', ') + '.'
+          : 'Nie znalazłem w nim żadnego arkusza.')
+      );
     }
     return podsumowanie;
   }
@@ -1782,8 +1815,13 @@ table.items-table .c-val{width:28mm;text-align:right;white-space:nowrap}
         $('numer').value = nastepnyNumer(new Date($('dataWystawienia').value || dzis()).getFullYear());
       }
       render();
+      var razem = p.klienci + p.uslugi + p.rejestr + p.ustawienia;
       komunikat($('msgXlsx'),
-        'Wczytano: klienci ' + p.klienci + ', usługi ' + p.uslugi + ', rachunki w rejestrze ' + p.rejestr + '.', 'ok');
+        razem
+          ? 'Wczytano: klienci ' + p.klienci + ', usługi ' + p.uslugi +
+            ', rachunki w rejestrze ' + p.rejestr + ', pola ustawień ' + p.ustawienia + '.'
+          : 'Arkusze są, ale nie ma w nich danych poza nagłówkami — nic nie wczytałem.',
+        razem ? 'ok' : 'warn');
     }catch(e){
       komunikat($('msgXlsx'), 'Nie udało się wczytać: ' + e.message, 'warn');
     }
