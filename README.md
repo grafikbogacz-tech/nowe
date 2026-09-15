@@ -1,50 +1,65 @@
-# Generator rachunków
+# Generator rachunków — działalność nierejestrowana
 
-Rachunek do umowy o dzieło / zlecenia — jeden plik HTML, bez instalacji.
-Liczy: kwota brutto → koszty uzyskania przychodu → zaliczka na podatek → do wypłaty,
-i podaje kwotę słownie. Dokument drukuje się na jedną stronę A4.
+Jeden plik HTML. Bez Pythona, bez instalacji, bez serwera.
+Zastępuje aplikację Flask + Excel + szablon Word z folderu
+`D:\NARZEDZIA PRACY\generator rachunków`, która przestała się uruchamiać —
+przyczyny opisane w [`archiwum/DIAGNOZA.md`](archiwum/DIAGNOZA.md).
 
 ## Jak używać
 
-1. Pobierz plik `index.html`.
-2. Kliknij go dwa razy — otworzy się w przeglądarce.
-3. Wypełnij formularz po lewej. Dokument po prawej aktualizuje się na bieżąco.
-4. Kliknij **Wydrukuj / Zapisz PDF** i w okienku druku wybierz „Zapisz jako PDF".
+1. Pobierz `index.html`.
+2. Kliknij dwa razy — otworzy się w przeglądarce.
+3. Zakładka **Moje dane** → uzupełnij dane sprzedawcy i numer konta (raz).
+4. Zakładka **Rachunek** → wypełnij i kliknij **Zapisz PDF**.
 
-Nie trzeba niczego instalować: żadnego Node, PHP ani serwera. Działa też offline.
+W oknie druku wybierz „Zapisz jako PDF". Dokument mieści się na stronie A4.
 
-## Opcjonalnie: na domenie
+Działa offline. Nic nie wysyła na zewnątrz — wszystko liczy się w przeglądarce.
+Ten sam plik możesz wrzucić na domenę (najlepiej pod hasłem) i mieć go z telefonu.
 
-Ten sam plik możesz wrzucić przez FTP na serwer (najlepiej do katalogu zabezpieczonego
-hasłem, np. `.htpasswd`) i wtedy masz generator dostępny również z telefonu.
-Plik nie wysyła danych nigdzie — całość liczy się w przeglądarce.
+## Zakładki
 
-## Przyciski
+**Rachunek** — numer, daty, nabywca i pozycje. Numer podpowiada się sam
+(kolejny wolny w danym roku, format `NN/RRRR`). Termin płatności wylicza się
+z daty wystawienia i domyślnej liczby dni.
 
-- **Wydrukuj / Zapisz PDF** — otwiera okno druku przeglądarki.
-- **Nowy rachunek** — zwiększa numer o 1, czyści przedmiot umowy i kwotę,
-  zostawia dane zleceniodawcy i wykonawcy.
-- **Wyczyść wszystko** — czyści cały formularz.
+**Klienci** — baza nabywców. Wybrany klient wypełnia dane i ustawia walutę:
+PL → PLN, UK → GBP, pozostałe kraje → EUR.
 
-Dane wpisane w formularz są zapamiętywane w przeglądarce (`localStorage`),
-więc po ponownym otwarciu pliku nie trzeba wpisywać ich od nowa.
-Jeśli przeglądarka blokuje zapis dla plików lokalnych, pojawi się informacja w panelu.
+**Usługi** — cennik. Pozycję wstawiasz jednym kliknięciem razem z ceną i jednostką.
 
-## Stawki podatkowe
+**Rejestr** — wystawione rachunki ze statusem „Oczekuje na wpłatę" / „Opłacony".
+Eksport do CSV otwiera się w Excelu.
 
-Stawka zaliczki PIT i koszty uzyskania przychodu to **pola edytowalne**, nie są
-zabetonowane w kodzie. Przed pierwszym użyciem sprawdź, czy domyślne wartości
-odpowiadają aktualnym przepisom i Twojej sytuacji.
+**Moje dane** — dane sprzedawcy, konto, domyślny termin płatności
+oraz kopia zapasowa wszystkich danych do pliku `.json`.
 
-Zaokrąglenia zgodne z praktyką: podstawa opodatkowania i zaliczka na podatek
-zaokrąglane do pełnych złotych. Wszystkie kwoty liczone na liczbach całkowitych
-(w groszach), żeby uniknąć błędów zaokrągleń zmiennoprzecinkowych.
+## Co się zmieniło względem starej wersji
 
-Generator nie obsługuje składek ZUS — jest przeznaczony dla umowy o dzieło
-oraz umowy zlecenia bez obowiązku składkowego.
+- **Wiele pozycji na rachunku.** Stara wersja obsługiwała jedną — rachunek
+  `01/2026` z dwiema pozycjami musiał powstać z ręcznej edycji Worda.
+- **Kwota słownie z nazwą waluty.** W starym pliku PDF było
+  `Czterysta sześćdziesiąt 00/100`, bez słowa „złotych". Teraz jest poprawnie,
+  z odmianą dla PLN, GBP i EUR.
+- **PDF od razu**, bez pośredniego kroku Word → PDF.
+- **Excel nie musi być zamknięty** — bo nie ma Excela w obiegu.
 
-## Czego to nie zastępuje
+## Dane i kopia zapasowa
 
-Narzędzie do wystawiania dokumentu, nie księgowość. Nie prowadzi rejestru
-rachunków, nie pilnuje limitu ulgi dla osób do 26 lat i nie obsługuje KSeF
-(który dotyczy faktur B2B, nie rachunków do umów cywilnoprawnych).
+Wszystko siedzi w `localStorage` tej przeglądarki, na tym komputerze.
+Nie jest to backup: wyczyszczenie danych witryny kasuje bazę.
+
+Przed zmianą komputera albo czyszczeniem historii zrób
+**Moje dane → Zapisz kopię (.json)**. Tym samym miejscem wczytasz ją z powrotem.
+
+## Czego to nie robi
+
+Nie prowadzi księgowości i nie pilnuje limitu przychodu dla działalności
+nierejestrowanej. Nie obsługuje KSeF — ten dotyczy faktur, nie rachunków
+wystawianych w działalności nierejestrowanej.
+
+## Plik dodatkowy
+
+`rachunek-umowa-o-dzielo.html` — osobny generator rachunku do umowy o dzieło
+lub zlecenia (brutto → koszty uzyskania → zaliczka PIT → do wypłaty).
+Inny typ dokumentu, przyda się gdybyś sama komuś płaciła na umowę cywilnoprawną.

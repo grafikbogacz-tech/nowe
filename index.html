@@ -3,21 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Generator rachunków — umowa o dzieło / zlecenie</title>
+<title>Generator rachunków — działalność nierejestrowana</title>
 <style>
 :root{
   --bg:#f4f5f7;
-  --panel:#ffffff;
+  --panel:#fff;
   --ink:#1c1f24;
   --muted:#5c6673;
   --line:#d8dde3;
   --line-soft:#eaeef2;
   --accent:#1f5f8b;
-  --accent-ink:#ffffff;
+  --accent-ink:#fff;
+  --danger:#a02b2b;
   --warn:#8a5a00;
   --warn-bg:#fff6e0;
+  --ok:#1d6b45;
+  --ok-bg:#e8f5ee;
   --radius:8px;
-  --space:16px;
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -29,56 +31,66 @@ body{
   font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 }
 
-/* ---------- Layout ---------- */
-
 .app{
   display:grid;
-  grid-template-columns:1fr;
-  gap:var(--space);
-  max-width:1400px;
+  grid-template-columns:minmax(0,1fr);
+  gap:16px;
+  max-width:1500px;
   margin:0 auto;
-  padding:var(--space);
+  padding:16px;
 }
 
-@media (min-width:1080px){
-  .app{grid-template-columns:minmax(380px,440px) 1fr;align-items:start}
-  .panel{position:sticky;top:var(--space);max-height:calc(100vh - 2*var(--space));overflow-y:auto}
+@media (min-width:1120px){
+  .app{grid-template-columns:minmax(400px,470px) minmax(0,1fr);align-items:start}
+  .panel{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto}
 }
-
-/* ---------- Panel formularza ---------- */
 
 .panel{
   background:var(--panel);
   border:1px solid var(--line);
   border-radius:var(--radius);
-  padding:var(--space);
+  padding:16px;
 }
 
-.panel h1{
-  margin:0 0 4px;
-  font-size:1.125rem;
-  letter-spacing:-.01em;
+.panel > h1{margin:0 0 12px;font-size:1.0625rem;letter-spacing:-.01em}
+
+/* ---------- Zakładki ---------- */
+
+.tabs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  margin-bottom:16px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--line-soft);
 }
 
-.panel .lede{
-  margin:0 0 var(--space);
+.tabs button{
+  padding:7px 11px;
+  border:1px solid transparent;
+  border-radius:6px;
+  background:transparent;
   color:var(--muted);
-  font-size:.875rem;
+  font:inherit;
+  font-size:.8125rem;
+  font-weight:600;
+  cursor:pointer;
 }
 
-fieldset{
-  border:0;
-  border-top:1px solid var(--line-soft);
-  margin:24px 0 0;
-  padding:20px 0 0;
+.tabs button:hover{background:var(--line-soft);color:var(--ink)}
+
+.tabs button[aria-selected="true"]{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:var(--accent-ink);
 }
 
-fieldset:first-of-type{margin-top:0;border-top:0;padding-top:0}
+/* ---------- Pola ---------- */
+
+fieldset{border:0;margin:0 0 18px;padding:0}
 
 legend{
-  display:block;
-  margin-bottom:4px;
-  padding:0;
+  padding:0 0 6px;
   font-size:.75rem;
   font-weight:700;
   text-transform:uppercase;
@@ -86,21 +98,16 @@ legend{
   color:var(--muted);
 }
 
-.field{margin-top:12px}
+.field{margin-bottom:12px}
 
-.field label,
-.field .label{
+.field label{
   display:block;
   margin-bottom:4px;
   font-size:.8125rem;
   font-weight:600;
 }
 
-.field .hint{
-  margin-top:4px;
-  font-size:.75rem;
-  color:var(--muted);
-}
+.hint{margin:4px 0 0;font-size:.75rem;color:var(--muted)}
 
 input,select,textarea{
   width:100%;
@@ -113,7 +120,7 @@ input,select,textarea{
   font-size:.9375rem;
 }
 
-textarea{min-height:72px;resize:vertical}
+textarea{min-height:64px;resize:vertical}
 
 input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{
   outline:2px solid var(--accent);
@@ -121,29 +128,14 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 }
 
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 
-.check{
-  display:flex;
-  align-items:flex-start;
-  gap:8px;
-  margin-top:12px;
-}
-
-.check input{width:auto;margin-top:3px;flex:0 0 auto}
-
-.check label{margin:0;font-weight:600;font-size:.8125rem}
-
-.actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:var(--space);
-  padding-top:var(--space);
-  border-top:1px solid var(--line-soft);
+@media (max-width:460px){
+  .row,.row-3{grid-template-columns:1fr}
 }
 
 button{
-  padding:10px 14px;
+  padding:9px 13px;
   border:1px solid var(--line);
   border-radius:6px;
   background:#fff;
@@ -156,26 +148,104 @@ button{
 
 button:hover{background:var(--line-soft)}
 
-button.primary{
-  background:var(--accent);
-  border-color:var(--accent);
-  color:var(--accent-ink);
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.primary:hover{filter:brightness(1.12)}
+button.small{padding:5px 9px;font-size:.8125rem;font-weight:500}
+button.link{
+  padding:0;
+  border:0;
+  background:none;
+  color:var(--danger);
+  font-size:.8125rem;
+  text-decoration:underline;
+}
+button.link:hover{background:none}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:16px;
+  padding-top:16px;
+  border-top:1px solid var(--line-soft);
 }
 
-button.primary:hover{filter:brightness(1.1)}
+/* ---------- Pozycje rachunku ---------- */
 
-.note{
-  margin-top:var(--space);
+.items{margin-bottom:8px}
+
+.item{
+  margin-bottom:10px;
+  padding:10px;
+  border:1px solid var(--line-soft);
+  border-radius:6px;
+  background:#fbfcfd;
+}
+
+.item .field:last-child{margin-bottom:0}
+
+.item-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+
+.item-head strong{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+
+.item-sum{
+  margin-top:8px;
+  font-size:.8125rem;
+  font-weight:600;
+  text-align:right;
+}
+
+/* ---------- Listy (klienci, usługi, rejestr) ---------- */
+
+.list{margin:0 0 12px;padding:0;list-style:none}
+
+.list li{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+  padding:9px 0;
+  border-bottom:1px solid var(--line-soft);
+  font-size:.875rem;
+}
+
+.list li:first-child{border-top:1px solid var(--line-soft)}
+
+.list .meta{display:block;color:var(--muted);font-size:.75rem}
+
+.empty{
+  margin:0 0 12px;
+  padding:14px;
+  border:1px dashed var(--line);
+  border-radius:6px;
+  color:var(--muted);
+  font-size:.8125rem;
+  text-align:center;
+}
+
+.msg{
+  margin:12px 0 0;
   padding:10px 12px;
   border-radius:6px;
-  background:var(--warn-bg);
-  color:var(--warn);
   font-size:.8125rem;
 }
 
+.msg.warn{background:var(--warn-bg);color:var(--warn)}
+.msg.ok{background:var(--ok-bg);color:var(--ok)}
+
+.reg-table{width:100%;border-collapse:collapse;font-size:.8125rem}
+.reg-table th,.reg-table td{padding:6px 6px;border-bottom:1px solid var(--line-soft);text-align:left}
+.reg-table th{font-size:.6875rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.reg-table td.num{text-align:right;white-space:nowrap}
+
 /* ---------- Dokument ---------- */
 
-.doc-wrap{display:flex;justify-content:center}
+.doc-wrap{display:flex;justify-content:center;overflow-x:auto}
 
 .doc{
   display:flex;
@@ -183,43 +253,43 @@ button.primary:hover{filter:brightness(1.1)}
   width:100%;
   max-width:210mm;
   min-height:297mm;
-  padding:18mm 16mm;
+  padding:16mm 15mm;
   background:#fff;
   border:1px solid var(--line);
   border-radius:var(--radius);
   color:#000;
   font-family:"Times New Roman",Georgia,serif;
-  font-size:11pt;
-  line-height:1.45;
+  font-size:10.5pt;
+  line-height:1.4;
 }
 
-.doc-head{
+.doc h2{margin:0 0 3mm;font-size:15pt;letter-spacing:.02em}
+
+.doc .legal{
+  margin:0 0 7mm;
+  font-size:8pt;
+  line-height:1.35;
+  color:#333;
+}
+
+.dates{
   display:flex;
   flex-wrap:wrap;
-  justify-content:space-between;
-  align-items:baseline;
-  gap:8px;
-  margin-bottom:10mm;
+  gap:2mm 10mm;
+  margin-bottom:7mm;
+  font-size:9.5pt;
 }
-
-.doc-head h2{
-  margin:0;
-  font-size:16pt;
-  letter-spacing:.02em;
-}
-
-.doc-place{font-size:10pt;text-align:right}
 
 .parties{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10mm;
-  margin-bottom:8mm;
+  gap:8mm;
+  margin-bottom:7mm;
 }
 
 .party h3{
-  margin:0 0 3mm;
-  font-size:9pt;
+  margin:0 0 2mm;
+  font-size:8.5pt;
   font-weight:700;
   text-transform:uppercase;
   letter-spacing:.06em;
@@ -227,78 +297,72 @@ button.primary:hover{filter:brightness(1.1)}
 
 .party p{margin:0;white-space:pre-line}
 
-.contract{margin-bottom:6mm}
-
-.contract p{margin:0 0 2mm}
-
-.subject{margin-bottom:8mm}
-
-.subject h3{
-  margin:0 0 2mm;
-  font-size:9pt;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:.06em;
-}
-
-.subject p{margin:0;white-space:pre-line}
-
-table.calc{
+table.items-table{
   width:100%;
   border-collapse:collapse;
-  margin-bottom:6mm;
+  margin-bottom:5mm;
+  font-size:9.5pt;
 }
 
-table.calc th,
-table.calc td{
-  padding:2.5mm 3mm;
+table.items-table th,
+table.items-table td{
+  padding:2mm 2.5mm;
   border:1px solid #000;
   text-align:left;
   vertical-align:top;
 }
 
-table.calc td.num{
-  width:38mm;
+table.items-table th{font-size:8.5pt;font-weight:700}
+table.items-table .c-lp{width:9mm;text-align:center}
+table.items-table .c-qty{width:22mm;text-align:right;white-space:nowrap}
+table.items-table .c-price{width:26mm;text-align:right;white-space:nowrap}
+table.items-table .c-val{width:28mm;text-align:right;white-space:nowrap}
+
+.total-block{page-break-inside:avoid}
+
+.total{
+  margin:0 0 2mm;
+  font-size:12pt;
+  font-weight:700;
   text-align:right;
-  white-space:nowrap;
-  font-variant-numeric:tabular-nums;
 }
 
-table.calc tr.total th,
-table.calc tr.total td{font-weight:700}
+.words{margin:0 0 7mm;text-align:right}
 
-.words{margin-bottom:8mm}
+.payment{margin-bottom:8mm;page-break-inside:avoid}
 
-.payment{margin-bottom:14mm}
-
-.payment p{margin:0 0 2mm}
-
-.signs{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14mm;
-  margin-top:auto;
-  padding-top:10mm;
+.payment h3{
+  margin:0 0 2mm;
+  font-size:8.5pt;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
 }
+
+.payment p{margin:0 0 1.5mm}
+
+.thanks{margin:0;padding-top:4mm}
+
+.doc-foot{margin-top:auto;padding-top:12mm}
+
+.signs{display:grid;grid-template-columns:1fr 1fr;gap:14mm;page-break-inside:avoid}
 
 .sign{
   padding-top:2mm;
   border-top:1px solid #000;
-  font-size:9pt;
+  font-size:8.5pt;
   text-align:center;
 }
 
-.muted-doc{color:#555}
-
 /* ---------- Druk ---------- */
 
-@page{size:A4;margin:15mm}
+@page{size:A4;margin:14mm}
 
 @media print{
   body{background:#fff}
   .app{display:block;max-width:none;margin:0;padding:0}
   .panel,.screen-only{display:none !important}
-  .doc-wrap{display:block}
+  .doc-wrap{display:block;overflow:visible}
   .doc{
     max-width:none;
     width:auto;
@@ -307,7 +371,6 @@ table.calc tr.total td{font-weight:700}
     border:0;
     border-radius:0;
   }
-  .signs{page-break-inside:avoid}
 }
 </style>
 </head>
@@ -315,225 +378,271 @@ table.calc tr.total td{font-weight:700}
 
 <div class="app">
 
-  <!-- ============ FORMULARZ ============ -->
-  <form class="panel screen-only" id="form" autocomplete="off">
+  <div class="panel screen-only">
     <h1>Generator rachunków</h1>
-    <p class="lede">Umowa o dzieło / zlecenia bez składek ZUS. Wypełnij pola — dokument obok aktualizuje się na bieżąco.</p>
 
-    <fieldset>
-      <legend>Rachunek</legend>
-      <div class="row">
-        <div class="field">
-          <label for="nr">Numer rachunku</label>
-          <input id="nr" name="nr" type="text">
-        </div>
-        <div class="field">
-          <label for="dataWyst">Data wystawienia</label>
-          <input id="dataWyst" name="dataWyst" type="date">
-        </div>
-      </div>
-      <div class="field">
-        <label for="miejscowosc">Miejscowość</label>
-        <input id="miejscowosc" name="miejscowosc" type="text">
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>Zleceniodawca (płatnik)</legend>
-      <div class="field">
-        <label for="zdNazwa">Nazwa</label>
-        <input id="zdNazwa" name="zdNazwa" type="text">
-      </div>
-      <div class="field">
-        <label for="zdAdres">Adres</label>
-        <textarea id="zdAdres" name="zdAdres" rows="2"></textarea>
-      </div>
-      <div class="field">
-        <label for="zdNip">NIP</label>
-        <input id="zdNip" name="zdNip" type="text" inputmode="numeric">
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>Wykonawca</legend>
-      <div class="field">
-        <label for="wkNazwa">Imię i nazwisko</label>
-        <input id="wkNazwa" name="wkNazwa" type="text">
-      </div>
-      <div class="field">
-        <label for="wkAdres">Adres</label>
-        <textarea id="wkAdres" name="wkAdres" rows="2"></textarea>
-      </div>
-      <div class="row">
-        <div class="field">
-          <label for="wkPesel">PESEL</label>
-          <input id="wkPesel" name="wkPesel" type="text" inputmode="numeric">
-        </div>
-        <div class="field">
-          <label for="wkUs">Urząd skarbowy</label>
-          <input id="wkUs" name="wkUs" type="text">
-        </div>
-      </div>
-      <div class="field">
-        <label for="wkKonto">Numer konta</label>
-        <input id="wkKonto" name="wkKonto" type="text" inputmode="numeric">
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>Umowa</legend>
-      <div class="field">
-        <label for="umowaTyp">Rodzaj umowy</label>
-        <select id="umowaTyp" name="umowaTyp">
-          <option value="o dzieło">umowa o dzieło</option>
-          <option value="zlecenia">umowa zlecenia</option>
-        </select>
-      </div>
-      <div class="row">
-        <div class="field">
-          <label for="umowaNr">Numer umowy</label>
-          <input id="umowaNr" name="umowaNr" type="text">
-        </div>
-        <div class="field">
-          <label for="umowaData">Data umowy</label>
-          <input id="umowaData" name="umowaData" type="date">
-        </div>
-      </div>
-      <div class="field">
-        <label for="przedmiot">Przedmiot umowy / opis wykonanych prac</label>
-        <textarea id="przedmiot" name="przedmiot" rows="3"></textarea>
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>Kwoty</legend>
-      <div class="field">
-        <label for="brutto">Kwota brutto (zł)</label>
-        <input id="brutto" name="brutto" type="text" inputmode="decimal" placeholder="np. 3000,00">
-      </div>
-      <div class="row">
-        <div class="field">
-          <label for="kup">Koszty uzyskania przychodu</label>
-          <select id="kup" name="kup">
-            <option value="20">20%</option>
-            <option value="50">50%</option>
-            <option value="0">0% (brak)</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="stawkaPit">Stawka zaliczki PIT (%)</label>
-          <input id="stawkaPit" name="stawkaPit" type="text" inputmode="decimal">
-          <p class="hint">Sprawdź aktualną stawkę.</p>
-        </div>
-      </div>
-      <div class="check">
-        <input id="pitZero" name="pitZero" type="checkbox">
-        <label for="pitZero">Zwolnienie z zaliczki PIT (np. ulga dla osób do 26 lat) — zaliczka = 0 zł</label>
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>Płatność</legend>
-      <div class="field">
-        <label for="sposob">Sposób zapłaty</label>
-        <select id="sposob" name="sposob">
-          <option value="przelew">przelew na wskazany rachunek bankowy</option>
-          <option value="gotowka">gotówką</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="termin">Termin płatności</label>
-        <input id="termin" name="termin" type="date">
-      </div>
-    </fieldset>
-
-    <div class="actions">
-      <button type="button" class="primary" id="btnPrint">Wydrukuj / Zapisz PDF</button>
-      <button type="button" id="btnNew">Nowy rachunek</button>
-      <button type="button" id="btnClear">Wyczyść wszystko</button>
+    <div class="tabs" role="tablist" aria-label="Sekcje generatora">
+      <button type="button" role="tab" id="tab-rachunek" aria-controls="p-rachunek" aria-selected="true">Rachunek</button>
+      <button type="button" role="tab" id="tab-klienci"  aria-controls="p-klienci"  aria-selected="false">Klienci</button>
+      <button type="button" role="tab" id="tab-uslugi"   aria-controls="p-uslugi"   aria-selected="false">Usługi</button>
+      <button type="button" role="tab" id="tab-rejestr"  aria-controls="p-rejestr"  aria-selected="false">Rejestr</button>
+      <button type="button" role="tab" id="tab-dane"     aria-controls="p-dane"     aria-selected="false">Moje dane</button>
     </div>
 
-    <p class="note">
-      Generator wykonuje obliczenia na podstawie stawek, które wpisujesz powyżej — nie zastępuje księgowości.
-      Zaokrąglenia: podstawa opodatkowania i zaliczka na podatek do pełnych złotych.
-      Ulga dla osób do 26 lat ma roczny limit przychodu — pilnuj go poza generatorem.
-    </p>
-    <p class="note" id="storageNote" hidden>
-      Przeglądarka nie pozwala zapisać danych lokalnie, więc pola nie zostaną zapamiętane po zamknięciu.
-      Wrzuć plik na serwer/domenę, jeśli chcesz, żeby zapamiętywał dane.
-    </p>
-  </form>
+    <!-- ===== RACHUNEK ===== -->
+    <section role="tabpanel" id="p-rachunek" aria-labelledby="tab-rachunek">
+      <fieldset>
+        <legend>Dokument</legend>
+        <div class="row">
+          <div class="field">
+            <label for="numer">Numer rachunku</label>
+            <input id="numer" type="text" placeholder="03/2026">
+          </div>
+          <div class="field">
+            <label for="waluta">Waluta</label>
+            <select id="waluta">
+              <option value="PLN">PLN — zł</option>
+              <option value="EUR">EUR — €</option>
+              <option value="GBP">GBP — £</option>
+            </select>
+          </div>
+        </div>
+        <div class="row-3">
+          <div class="field">
+            <label for="dataWystawienia">Wystawienia</label>
+            <input id="dataWystawienia" type="date">
+          </div>
+          <div class="field">
+            <label for="dataWykonania">Wykonania</label>
+            <input id="dataWykonania" type="date">
+          </div>
+          <div class="field">
+            <label for="terminPlatnosci">Termin płatności</label>
+            <input id="terminPlatnosci" type="date">
+          </div>
+        </div>
+      </fieldset>
 
-  <!-- ============ DOKUMENT ============ -->
+      <fieldset>
+        <legend>Nabywca</legend>
+        <div class="field">
+          <label for="wyborKlienta">Wybierz z bazy</label>
+          <select id="wyborKlienta"><option value="">— wpisz ręcznie poniżej —</option></select>
+        </div>
+        <div class="field">
+          <label for="klientNazwa">Nazwa / imię i nazwisko</label>
+          <input id="klientNazwa" type="text">
+        </div>
+        <div class="field">
+          <label for="klientAdres">Adres</label>
+          <textarea id="klientAdres" rows="2"></textarea>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="klientNip">NIP</label>
+            <input id="klientNip" type="text" placeholder="Brak">
+          </div>
+          <div class="field">
+            <label for="klientKraj">Kraj</label>
+            <input id="klientKraj" type="text" placeholder="PL">
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Pozycje</legend>
+        <div class="items" id="items"></div>
+        <button type="button" class="small" id="btnDodajPozycje">+ Dodaj pozycję</button>
+      </fieldset>
+
+      <div class="actions">
+        <button type="button" class="primary" id="btnDrukuj">Zapisz PDF</button>
+        <button type="button" id="btnWystaw">Zapisz w rejestrze</button>
+        <button type="button" id="btnNowy">Nowy rachunek</button>
+      </div>
+      <p class="msg ok" id="msgRachunek" hidden></p>
+    </section>
+
+    <!-- ===== KLIENCI ===== -->
+    <section role="tabpanel" id="p-klienci" aria-labelledby="tab-klienci" hidden>
+      <ul class="list" id="listaKlientow"></ul>
+      <p class="empty" id="pustoKlienci" hidden>Brak klientów. Dodaj pierwszego poniżej — potem wybierzesz go z listy przy wystawianiu.</p>
+      <fieldset>
+        <legend>Nowy klient</legend>
+        <div class="field">
+          <label for="nkNazwa">Nazwa / imię i nazwisko</label>
+          <input id="nkNazwa" type="text">
+        </div>
+        <div class="field">
+          <label for="nkAdres">Adres</label>
+          <textarea id="nkAdres" rows="2"></textarea>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="nkNip">NIP</label>
+            <input id="nkNip" type="text" placeholder="Brak">
+          </div>
+          <div class="field">
+            <label for="nkKraj">Kraj</label>
+            <input id="nkKraj" type="text" value="PL">
+          </div>
+        </div>
+        <button type="button" class="primary" id="btnDodajKlienta">Dodaj klienta</button>
+        <p class="hint">Kraj ustawia domyślną walutę: PL → PLN, UK → GBP, pozostałe → EUR.</p>
+      </fieldset>
+    </section>
+
+    <!-- ===== USŁUGI ===== -->
+    <section role="tabpanel" id="p-uslugi" aria-labelledby="tab-uslugi" hidden>
+      <ul class="list" id="listaUslug"></ul>
+      <p class="empty" id="pustoUslugi" hidden>Brak usług w cenniku. Dodaj te, które wystawiasz najczęściej — przyspieszy to wypełnianie pozycji.</p>
+      <fieldset>
+        <legend>Nowa usługa</legend>
+        <div class="field">
+          <label for="nuNazwa">Nazwa usługi</label>
+          <input id="nuNazwa" type="text">
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="nuCena">Cena domyślna</label>
+            <input id="nuCena" type="text" inputmode="decimal" placeholder="250,00">
+          </div>
+          <div class="field">
+            <label for="nuJednostka">Jednostka</label>
+            <input id="nuJednostka" type="text" value="szt.">
+          </div>
+        </div>
+        <button type="button" class="primary" id="btnDodajUsluge">Dodaj usługę</button>
+      </fieldset>
+    </section>
+
+    <!-- ===== REJESTR ===== -->
+    <section role="tabpanel" id="p-rejestr" aria-labelledby="tab-rejestr" hidden>
+      <div id="rejestrBox"></div>
+      <p class="empty" id="pustoRejestr" hidden>Rejestr jest pusty. Wystawiony rachunek trafia tu po kliknięciu „Zapisz w rejestrze".</p>
+      <div class="actions">
+        <button type="button" id="btnCsv">Eksport do CSV</button>
+      </div>
+      <p class="hint">CSV otwiera się w Excelu — stamtąd przeniesiesz dane do ClickUp albo do księgowości.</p>
+    </section>
+
+    <!-- ===== MOJE DANE ===== -->
+    <section role="tabpanel" id="p-dane" aria-labelledby="tab-dane" hidden>
+      <fieldset>
+        <legend>Sprzedawca</legend>
+        <div class="field">
+          <label for="sprzImie">Imię i nazwisko</label>
+          <input id="sprzImie" type="text">
+        </div>
+        <div class="field">
+          <label for="sprzUlica">Ulica i numer</label>
+          <input id="sprzUlica" type="text">
+        </div>
+        <div class="field">
+          <label for="sprzMiasto">Kod pocztowy i miasto</label>
+          <input id="sprzMiasto" type="text">
+        </div>
+        <div class="field">
+          <label for="sprzKontakt">PESEL / kontakt (opcjonalnie)</label>
+          <input id="sprzKontakt" type="text">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Płatność</legend>
+        <div class="field">
+          <label for="sprzForma">Forma płatności</label>
+          <input id="sprzForma" type="text" value="Przelew">
+        </div>
+        <div class="field">
+          <label for="sprzKonto">Numer konta</label>
+          <input id="sprzKonto" type="text">
+        </div>
+        <div class="field">
+          <label for="sprzTermin">Domyślny termin płatności (dni)</label>
+          <input id="sprzTermin" type="number" min="0" value="14">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Kopia zapasowa</legend>
+        <p class="hint" style="margin-bottom:10px">
+          Wszystkie dane siedzą w tej przeglądarce. Zrób kopię przed zmianą komputera
+          albo czyszczeniem historii — plik .json wczytasz z powrotem tym samym przyciskiem.
+        </p>
+        <div class="actions" style="margin:0;padding:0;border:0">
+          <button type="button" id="btnEksport">Zapisz kopię (.json)</button>
+          <button type="button" id="btnImport">Wczytaj kopię</button>
+          <input type="file" id="plikImport" accept="application/json,.json" hidden>
+        </div>
+      </fieldset>
+
+      <p class="msg warn" id="msgStorage" hidden>
+        Ta przeglądarka nie pozwala zapisać danych lokalnie — po zamknięciu karty wszystko przepadnie.
+        Wrzuć plik na serwer albo użyj innej przeglądarki.
+      </p>
+    </section>
+  </div>
+
+  <!-- ===== DOKUMENT ===== -->
   <div class="doc-wrap">
     <article class="doc" id="doc" aria-live="polite">
+      <h2>RACHUNEK NR <span data-o="numer"></span></h2>
+      <p class="legal">
+        Dokument wystawiony przez osobę fizyczną wykonującą działalność nierejestrowaną
+        (zwolnienie z VAT na podstawie art. 113 ust. 1 i 9 ustawy o VAT)
+      </p>
 
-      <header class="doc-head">
-        <h2>RACHUNEK <span data-out="nr"></span></h2>
-        <div class="doc-place">
-          <div data-out="miejscowosc"></div>
-          <div data-out="dataWyst"></div>
-        </div>
-      </header>
+      <div class="dates">
+        <span>Data wystawienia: <strong data-o="dWyst"></strong></span>
+        <span>Data wykonania usługi: <strong data-o="dWyk"></strong></span>
+        <span>Termin płatności: <strong data-o="dTerm"></strong></span>
+      </div>
 
       <div class="parties">
         <section class="party">
-          <h3>Zleceniodawca</h3>
-          <p data-out="zleceniodawca"></p>
+          <h3>Sprzedawca</h3>
+          <p data-o="sprzedawca"></p>
         </section>
         <section class="party">
-          <h3>Wykonawca</h3>
-          <p data-out="wykonawca"></p>
+          <h3>Nabywca</h3>
+          <p data-o="nabywca"></p>
         </section>
       </div>
 
-      <div class="contract">
-        <p data-out="umowaOpis"></p>
-      </div>
-
-      <section class="subject">
-        <h3>Przedmiot umowy</h3>
-        <p data-out="przedmiot"></p>
-      </section>
-
-      <table class="calc">
-        <tbody>
+      <table class="items-table">
+        <thead>
           <tr>
-            <th scope="row">Kwota brutto (wynagrodzenie)</th>
-            <td class="num" data-out="mBrutto"></td>
+            <th class="c-lp">Lp.</th>
+            <th>Nazwa usługi / produktu</th>
+            <th class="c-qty">Ilość</th>
+            <th class="c-price">Cena</th>
+            <th class="c-val">Wartość</th>
           </tr>
-          <tr>
-            <th scope="row" data-out="lblKup">Koszty uzyskania przychodu</th>
-            <td class="num" data-out="mKup"></td>
-          </tr>
-          <tr>
-            <th scope="row">Podstawa opodatkowania</th>
-            <td class="num" data-out="mPodstawa"></td>
-          </tr>
-          <tr>
-            <th scope="row" data-out="lblPit">Zaliczka na podatek dochodowy</th>
-            <td class="num" data-out="mPit"></td>
-          </tr>
-          <tr class="total">
-            <th scope="row">Do wypłaty</th>
-            <td class="num" data-out="mNetto"></td>
-          </tr>
-        </tbody>
+        </thead>
+        <tbody id="docItems"></tbody>
       </table>
 
-      <p class="words">Słownie: <strong data-out="slownie"></strong></p>
-
-      <section class="payment">
-        <p data-out="sposobOpis"></p>
-        <p data-out="terminOpis"></p>
-        <p data-out="kontoOpis"></p>
-      </section>
-
-      <div class="signs">
-        <div class="sign">Wykonawca</div>
-        <div class="sign">Zleceniodawca / zatwierdził</div>
+      <div class="total-block">
+        <p class="total">RAZEM DO ZAPŁATY: <span data-o="razem"></span></p>
+        <p class="words">Słownie: <strong data-o="slownie"></strong></p>
       </div>
 
+      <section class="payment">
+        <h3>Dane do płatności</h3>
+        <p data-o="pForma"></p>
+        <p data-o="pKonto"></p>
+        <p data-o="pTytul"></p>
+      </section>
+
+      <p class="thanks">Dziękuję za współpracę!</p>
+
+      <div class="doc-foot">
+        <div class="signs">
+          <div class="sign">Sprzedawca</div>
+          <div class="sign">Nabywca</div>
+        </div>
+      </div>
     </article>
   </div>
 
@@ -543,282 +652,745 @@ table.calc tr.total td{font-weight:700}
 (function(){
   'use strict';
 
-  var form = document.getElementById('form');
-  var STORE_KEY = 'rachunek.v1';
+  var KEY = 'rachunki.dn.v1';
 
-  /* ---------- Pieniądze: wszystko w groszach (liczby całkowite) ---------- */
+  var WALUTY = {
+    PLN: {symbol:'zł', formy:['złoty','złote','złotych']},
+    GBP: {symbol:'£',  formy:['funt szterling','funty szterlingi','funtów szterlingów']},
+    EUR: {symbol:'€',  formy:null}
+  };
 
-  function parseMoney(value){
-    if(!value) return 0;
-    var clean = String(value).replace(/\s/g,'').replace(',', '.').replace(/[^0-9.\-]/g,'');
-    var num = parseFloat(clean);
-    if(!isFinite(num) || num < 0) return 0;
-    return Math.round(num * 100);
+  var KRAJ_WALUTA = {PL:'PLN', UK:'GBP'};
+
+  var db = {
+    ustawienia:{imie:'',ulica:'',miasto:'',kontakt:'',forma:'Przelew',konto:'',terminDni:14},
+    klienci:[],
+    uslugi:[],
+    rejestr:[]
+  };
+
+  var pozycje = [];
+  var storageOk = true;
+
+  /* ============ Pieniądze (grosze) ============ */
+
+  function toGrosze(v){
+    if(v === null || v === undefined || v === '') return 0;
+    var s = String(v).replace(/\s/g,'').replace(',', '.').replace(/[^0-9.\-]/g,'');
+    var n = parseFloat(s);
+    if(!isFinite(n) || n < 0) return 0;
+    return Math.round(n * 100);
   }
 
-  function parseRate(value){
-    var num = parseFloat(String(value || '').replace(',', '.'));
-    if(!isFinite(num) || num < 0) return 0;
-    return num;
+  function toNumber(v){
+    if(v === null || v === undefined || v === '') return 0;
+    var n = parseFloat(String(v).replace(/\s/g,'').replace(',', '.'));
+    return (isFinite(n) && n >= 0) ? n : 0;
   }
 
-  var fmt = new Intl.NumberFormat('pl-PL', {minimumFractionDigits:2, maximumFractionDigits:2});
+  var nf = new Intl.NumberFormat('pl-PL',{minimumFractionDigits:2,maximumFractionDigits:2});
 
-  function money(grosze){
-    return fmt.format(grosze / 100) + ' zł';
+  function kwota(gr, waluta){
+    return nf.format(gr/100) + ' ' + (WALUTY[waluta] ? WALUTY[waluta].symbol : waluta);
   }
 
-  /* ---------- Kwota słownie ---------- */
+  function ilosc(n){
+    return Number.isInteger(n) ? String(n) : String(n).replace('.', ',');
+  }
 
-  var ONES  = ['','jeden','dwa','trzy','cztery','pięć','sześć','siedem','osiem','dziewięć'];
-  var TEENS = ['dziesięć','jedenaście','dwanaście','trzynaście','czternaście','piętnaście','szesnaście','siedemnaście','osiemnaście','dziewiętnaście'];
-  var TENS  = ['','','dwadzieścia','trzydzieści','czterdzieści','pięćdziesiąt','sześćdziesiąt','siedemdziesiąt','osiemdziesiąt','dziewięćdziesiąt'];
-  var HUNDREDS = ['','sto','dwieście','trzysta','czterysta','pięćset','sześćset','siedemset','osiemset','dziewięćset'];
-  var GROUPS = [
-    null,
-    ['tysiąc','tysiące','tysięcy'],
-    ['milion','miliony','milionów'],
-    ['miliard','miliardy','miliardów']
-  ];
+  /* ============ Kwota słownie ============ */
 
-  function plural(n, one, few, many){
+  var J = ['','jeden','dwa','trzy','cztery','pięć','sześć','siedem','osiem','dziewięć'];
+  var N = ['dziesięć','jedenaście','dwanaście','trzynaście','czternaście','piętnaście','szesnaście','siedemnaście','osiemnaście','dziewiętnaście'];
+  var D = ['','','dwadzieścia','trzydzieści','czterdzieści','pięćdziesiąt','sześćdziesiąt','siedemdziesiąt','osiemdziesiąt','dziewięćdziesiąt'];
+  var S = ['','sto','dwieście','trzysta','czterysta','pięćset','sześćset','siedemset','osiemset','dziewięćset'];
+
+  function forma(n, f){
+    if(n === 1) return f[0];
     var d = n % 10, c = n % 100;
-    if(n === 1) return one;
-    if(d >= 2 && d <= 4 && !(c >= 12 && c <= 14)) return few;
-    return many;
+    if(d >= 2 && d <= 4 && !(c >= 12 && c <= 14)) return f[1];
+    return f[2];
   }
 
-  function tripletToWords(n){
-    var out = [];
-    var h = Math.floor(n / 100);
-    var rest = n % 100;
-    if(h) out.push(HUNDREDS[h]);
-    if(rest >= 10 && rest <= 19){
-      out.push(TEENS[rest - 10]);
+  function setki(n, jedenJako){
+    var w = [];
+    var h = Math.floor(n/100), r = n % 100;
+    if(h) w.push(S[h]);
+    if(r >= 10 && r < 20){
+      w.push(N[r-10]);
     } else {
-      var t = Math.floor(rest / 10);
-      var o = rest % 10;
-      if(t) out.push(TENS[t]);
-      if(o) out.push(ONES[o]);
+      var t = Math.floor(r/10), u = r % 10;
+      if(t) w.push(D[t]);
+      if(u) w.push((u === 1 && jedenJako) ? jedenJako : J[u]);
     }
-    return out.join(' ');
+    return w;
   }
 
-  function intToWords(n){
+  function liczbaSlownie(n, jedenJako){
     if(n === 0) return 'zero';
-    var triplets = [];
-    while(n > 0){
-      triplets.push(n % 1000);
-      n = Math.floor(n / 1000);
+    var w = [];
+    var mln = Math.floor(n/1000000);
+    var tys = Math.floor(n/1000) % 1000;
+    var reszta = n % 1000;
+    if(mln){
+      w = w.concat(setki(mln));
+      w.push(forma(mln, ['milion','miliony','milionów']));
     }
-    var parts = [];
-    for(var i = triplets.length - 1; i >= 0; i--){
-      var t = triplets[i];
-      if(!t) continue;
-      var words = tripletToWords(t);
-      if(i === 0){
-        parts.push(words);
+    if(tys){
+      if(tys === 1){
+        w.push('tysiąc');
       } else {
-        var g = GROUPS[i];
-        if(!g){ parts.push(words); continue; }
-        // "jeden tysiąc" skraca się do "tysiąc"
-        if(t === 1) parts.push(g[0]);
-        else parts.push(words + ' ' + plural(t, g[0], g[1], g[2]));
+        w = w.concat(setki(tys));
+        w.push(forma(tys, ['tysiąc','tysiące','tysięcy']));
       }
     }
-    return parts.join(' ');
+    if(reszta || !w.length) w = w.concat(setki(reszta, jedenJako));
+    return w.join(' ');
   }
 
-  function moneyToWords(grosze){
-    var zl = Math.floor(grosze / 100);
-    var gr = grosze % 100;
-    var text = intToWords(zl) + ' ' + plural(zl, 'złoty', 'złote', 'złotych');
-    text += ' ' + (gr < 10 ? '0' + gr : gr) + '/100';
-    return text.charAt(0).toUpperCase() + text.slice(1);
+  function kwotaSlownie(gr, waluta){
+    var calosc = Math.floor(gr/100), frac = gr % 100;
+    var jedenJako = (waluta === 'EUR') ? 'jedno' : null;
+    var slowa = liczbaSlownie(calosc, jedenJako);
+    var nazwa = (waluta === 'EUR')
+      ? 'euro'
+      : forma(calosc, (WALUTY[waluta] && WALUTY[waluta].formy) || [waluta,waluta,waluta]);
+    var txt = slowa + ' ' + nazwa + ' ' + (frac < 10 ? '0'+frac : frac) + '/100';
+    return txt.charAt(0).toUpperCase() + txt.slice(1);
   }
 
-  /* ---------- Pomocnicze ---------- */
+  /* ============ Pomocnicze ============ */
 
-  function val(name){
-    var el = form.elements[name];
-    if(!el) return '';
-    return el.type === 'checkbox' ? el.checked : el.value.trim();
-  }
+  function $(id){ return document.getElementById(id); }
 
-  function formatDate(iso){
+  function dataPl(iso){
     if(!iso) return '';
     var p = iso.split('-');
-    return p.length === 3 ? p[2] + '.' + p[1] + '.' + p[0] : iso;
+    return p.length === 3 ? p[2]+'.'+p[1]+'.'+p[0] : iso;
   }
 
-  function joinLines(){
+  function dzis(){
+    var d = new Date(), m = d.getMonth()+1, dd = d.getDate();
+    return d.getFullYear()+'-'+(m<10?'0'+m:m)+'-'+(dd<10?'0'+dd:dd);
+  }
+
+  function plusDni(iso, dni){
+    var d = new Date(iso + 'T00:00:00');
+    if(isNaN(d)) return '';
+    d.setDate(d.getDate() + Number(dni || 0));
+    var m = d.getMonth()+1, dd = d.getDate();
+    return d.getFullYear()+'-'+(m<10?'0'+m:m)+'-'+(dd<10?'0'+dd:dd);
+  }
+
+  function linie(){
     var out = [];
-    for(var i = 0; i < arguments.length; i++){
-      if(arguments[i]) out.push(arguments[i]);
-    }
+    for(var i=0;i<arguments.length;i++) if(arguments[i]) out.push(arguments[i]);
     return out.join('\n');
   }
 
-  var outputs = {};
-  Array.prototype.forEach.call(document.querySelectorAll('[data-out]'), function(el){
-    outputs[el.getAttribute('data-out')] = el;
+  var wy = {};
+  Array.prototype.forEach.call(document.querySelectorAll('[data-o]'), function(el){
+    wy[el.getAttribute('data-o')] = el;
   });
 
-  function put(key, text){
-    if(outputs[key]) outputs[key].textContent = text || '';
+  function put(k, t){ if(wy[k]) wy[k].textContent = t || ''; }
+
+  function komunikat(el, tekst, klasa){
+    el.textContent = tekst;
+    el.className = 'msg ' + (klasa || 'ok');
+    el.hidden = false;
+    window.clearTimeout(el._t);
+    el._t = window.setTimeout(function(){ el.hidden = true; }, 4000);
   }
 
-  /* ---------- Obliczenia + render ---------- */
+  /* ============ Zapis / odczyt ============ */
 
-  function render(){
-    var brutto = parseMoney(val('brutto'));
-    var kupPct = parseRate(val('kup'));
-    var pitPct = parseRate(val('stawkaPit'));
-    var pitZero = val('pitZero') === true;
-
-    var kup = Math.round(brutto * kupPct / 100);
-    var podstawaRaw = Math.max(0, brutto - kup);
-
-    // Podstawa opodatkowania zaokrąglana do pełnych złotych.
-    var podstawaZl = Math.round(podstawaRaw / 100);
-    var podstawa = podstawaZl * 100;
-
-    // Zaliczka na podatek również do pełnych złotych.
-    var pitZl = pitZero ? 0 : Math.round(podstawaZl * pitPct / 100);
-    var pit = pitZl * 100;
-
-    var netto = Math.max(0, brutto - pit);
-
-    put('mBrutto', money(brutto));
-    put('mKup', money(kup));
-    put('mPodstawa', money(podstawa));
-    put('mPit', money(pit));
-    put('mNetto', money(netto));
-    put('slownie', moneyToWords(netto));
-
-    put('lblKup', 'Koszty uzyskania przychodu (' + fmt.format(kupPct).replace(',00','') + '%)');
-    put('lblPit', pitZero
-      ? 'Zaliczka na podatek dochodowy (zwolnienie)'
-      : 'Zaliczka na podatek dochodowy (' + fmt.format(pitPct).replace(',00','') + '%)');
-
-    // Nagłówek
-    var nr = val('nr');
-    put('nr', nr ? 'nr ' + nr : '');
-    put('miejscowosc', val('miejscowosc'));
-    var dw = formatDate(val('dataWyst'));
-    put('dataWyst', dw ? 'data wystawienia: ' + dw : '');
-
-    // Strony
-    put('zleceniodawca', joinLines(val('zdNazwa'), val('zdAdres'), val('zdNip') ? 'NIP: ' + val('zdNip') : ''));
-    put('wykonawca', joinLines(
-      val('wkNazwa'),
-      val('wkAdres'),
-      val('wkPesel') ? 'PESEL: ' + val('wkPesel') : '',
-      val('wkUs') ? 'Urząd skarbowy: ' + val('wkUs') : ''
-    ));
-
-    // Umowa
-    var typ = val('umowaTyp');
-    var opis = 'Rachunek do umowy ' + typ;
-    if(val('umowaNr')) opis += ' nr ' + val('umowaNr');
-    if(val('umowaData')) opis += ' z dnia ' + formatDate(val('umowaData'));
-    put('umowaOpis', opis);
-    put('przedmiot', val('przedmiot'));
-
-    // Płatność
-    var sposob = val('sposob');
-    put('sposobOpis', 'Sposób zapłaty: ' + (sposob === 'gotowka' ? 'gotówką' : 'przelew na wskazany rachunek bankowy'));
-    put('terminOpis', val('termin') ? 'Termin płatności: ' + formatDate(val('termin')) : '');
-    put('kontoOpis', (sposob !== 'gotowka' && val('wkKonto')) ? 'Nr rachunku: ' + val('wkKonto') : '');
-
-    save();
-  }
-
-  /* ---------- Zapis lokalny (best effort) ---------- */
-
-  var storageOk = true;
-
-  function save(){
+  function zapisz(){
     if(!storageOk) return;
     try{
-      var data = {};
-      Array.prototype.forEach.call(form.elements, function(el){
-        if(!el.name) return;
-        data[el.name] = el.type === 'checkbox' ? el.checked : el.value;
-      });
-      localStorage.setItem(STORE_KEY, JSON.stringify(data));
+      localStorage.setItem(KEY, JSON.stringify({db:db, pozycje:pozycje, rachunek:zbierzRachunek()}));
     }catch(e){
       storageOk = false;
-      var note = document.getElementById('storageNote');
-      if(note) note.hidden = false;
+      $('msgStorage').hidden = false;
     }
   }
 
-  function load(){
+  function odczytaj(){
     try{
-      var raw = localStorage.getItem(STORE_KEY);
-      if(!raw) return false;
-      var data = JSON.parse(raw);
-      Object.keys(data).forEach(function(name){
-        var el = form.elements[name];
-        if(!el) return;
-        if(el.type === 'checkbox') el.checked = !!data[name];
-        else el.value = data[name];
-      });
-      return true;
+      var raw = localStorage.getItem(KEY);
+      if(!raw) return null;
+      return JSON.parse(raw);
     }catch(e){
       storageOk = false;
-      return false;
+      return null;
     }
   }
 
-  /* ---------- Wartości domyślne ---------- */
-
-  function today(){
-    var d = new Date();
-    var m = d.getMonth() + 1;
-    var day = d.getDate();
-    return d.getFullYear() + '-' + (m < 10 ? '0' + m : m) + '-' + (day < 10 ? '0' + day : day);
+  function zbierzRachunek(){
+    return {
+      numer:$('numer').value, waluta:$('waluta').value,
+      dataWystawienia:$('dataWystawienia').value,
+      dataWykonania:$('dataWykonania').value,
+      terminPlatnosci:$('terminPlatnosci').value,
+      klientNazwa:$('klientNazwa').value, klientAdres:$('klientAdres').value,
+      klientNip:$('klientNip').value, klientKraj:$('klientKraj').value
+    };
   }
 
-  function setDefaults(){
-    form.elements.dataWyst.value = today();
-    form.elements.nr.value = '1/' + new Date().getFullYear();
-    form.elements.stawkaPit.value = '12';
-    form.elements.kup.value = '20';
-  }
+  /* ============ Numeracja ============ */
 
-  /* ---------- Akcje ---------- */
-
-  document.getElementById('btnPrint').addEventListener('click', function(){
-    window.print();
-  });
-
-  document.getElementById('btnNew').addEventListener('click', function(){
-    // Zwiększa pierwszą liczbę w numerze: "3/2026" -> "4/2026"
-    form.elements.nr.value = form.elements.nr.value.replace(/\d+/, function(n){
-      return String(parseInt(n, 10) + 1);
+  function nastepnyNumer(rok){
+    var max = 0;
+    db.rejestr.forEach(function(r){
+      var m = /^\s*(\d+)\s*\/\s*(\d{4})\s*$/.exec(String(r.numer || ''));
+      if(m && Number(m[2]) === rok) max = Math.max(max, Number(m[1]));
     });
-    form.elements.przedmiot.value = '';
-    form.elements.brutto.value = '';
-    form.elements.dataWyst.value = today();
-    form.elements.termin.value = '';
-    render();
-    form.elements.przedmiot.focus();
+    var n = max + 1;
+    return (n < 10 ? '0'+n : String(n)) + '/' + rok;
+  }
+
+  /* ============ Pozycje ============ */
+
+  function nowaPozycja(){
+    return {nazwa:'', ilosc:1, jednostka:'szt.', cena:''};
+  }
+
+  function rysujPozycje(){
+    var box = $('items');
+    box.textContent = '';
+
+    pozycje.forEach(function(p, i){
+      var wrap = document.createElement('div');
+      wrap.className = 'item';
+
+      var head = document.createElement('div');
+      head.className = 'item-head';
+      var lbl = document.createElement('strong');
+      lbl.textContent = 'Pozycja ' + (i+1);
+      head.appendChild(lbl);
+      if(pozycje.length > 1){
+        var del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'link';
+        del.textContent = 'Usuń';
+        del.addEventListener('click', function(){
+          pozycje.splice(i,1);
+          rysujPozycje();
+          render();
+        });
+        head.appendChild(del);
+      }
+      wrap.appendChild(head);
+
+      // Wybór z cennika
+      if(db.uslugi.length){
+        var fSel = document.createElement('div');
+        fSel.className = 'field';
+        var lSel = document.createElement('label');
+        lSel.textContent = 'Z cennika';
+        lSel.setAttribute('for', 'poz-sel-'+i);
+        var sel = document.createElement('select');
+        sel.id = 'poz-sel-'+i;
+        var opt0 = document.createElement('option');
+        opt0.value = '';
+        opt0.textContent = '— wpisz ręcznie —';
+        sel.appendChild(opt0);
+        db.uslugi.forEach(function(u, ui){
+          var o = document.createElement('option');
+          o.value = String(ui);
+          o.textContent = u.nazwa;
+          sel.appendChild(o);
+        });
+        sel.addEventListener('change', function(){
+          var u = db.uslugi[Number(sel.value)];
+          if(!u) return;
+          pozycje[i].nazwa = u.nazwa;
+          pozycje[i].cena = u.cena;
+          pozycje[i].jednostka = u.jednostka;
+          rysujPozycje();
+          render();
+        });
+        fSel.appendChild(lSel);
+        fSel.appendChild(sel);
+        wrap.appendChild(fSel);
+      }
+
+      wrap.appendChild(pole('Nazwa', 'text', p.nazwa, 'poz-nazwa-'+i, function(v){ pozycje[i].nazwa = v; }));
+
+      var row = document.createElement('div');
+      row.className = 'row-3';
+      row.appendChild(pole('Ilość', 'text', p.ilosc, 'poz-ilosc-'+i, function(v){ pozycje[i].ilosc = v; }));
+      row.appendChild(pole('Jedn.', 'text', p.jednostka, 'poz-jedn-'+i, function(v){ pozycje[i].jednostka = v; }));
+      row.appendChild(pole('Cena', 'text', p.cena, 'poz-cena-'+i, function(v){ pozycje[i].cena = v; }));
+      wrap.appendChild(row);
+
+      var sum = document.createElement('p');
+      sum.className = 'item-sum';
+      sum.textContent = 'Wartość: ' + kwota(wartoscPozycji(p), $('waluta').value);
+      wrap.appendChild(sum);
+
+      box.appendChild(wrap);
+    });
+  }
+
+  function pole(etykieta, typ, wartosc, id, onChange){
+    var f = document.createElement('div');
+    f.className = 'field';
+    var l = document.createElement('label');
+    l.textContent = etykieta;
+    l.setAttribute('for', id);
+    var inp = document.createElement('input');
+    inp.type = typ;
+    inp.id = id;
+    inp.value = wartosc === null || wartosc === undefined ? '' : String(wartosc);
+    if(etykieta === 'Ilość' || etykieta === 'Cena') inp.inputMode = 'decimal';
+    inp.addEventListener('input', function(){
+      onChange(inp.value);
+      odswiezSumyPozycji();
+      render();
+    });
+    f.appendChild(l);
+    f.appendChild(inp);
+    return f;
+  }
+
+  function odswiezSumyPozycji(){
+    var sumy = document.querySelectorAll('#items .item-sum');
+    Array.prototype.forEach.call(sumy, function(el, i){
+      if(pozycje[i]) el.textContent = 'Wartość: ' + kwota(wartoscPozycji(pozycje[i]), $('waluta').value);
+    });
+  }
+
+  function wartoscPozycji(p){
+    return Math.round(toNumber(p.ilosc) * toGrosze(p.cena));
+  }
+
+  /* ============ Render dokumentu ============ */
+
+  function render(){
+    var waluta = $('waluta').value;
+    var u = db.ustawienia;
+
+    put('numer', $('numer').value);
+    put('dWyst', dataPl($('dataWystawienia').value));
+    put('dWyk', dataPl($('dataWykonania').value));
+    put('dTerm', dataPl($('terminPlatnosci').value));
+
+    put('sprzedawca', linie(u.imie, u.ulica, u.miasto, u.kontakt));
+    put('nabywca', linie(
+      $('klientNazwa').value,
+      $('klientAdres').value,
+      $('klientNip').value ? 'NIP: ' + $('klientNip').value : ''
+    ));
+
+    var tbody = $('docItems');
+    tbody.textContent = '';
+    var razem = 0;
+
+    pozycje.forEach(function(p, i){
+      var w = wartoscPozycji(p);
+      razem += w;
+      var tr = document.createElement('tr');
+      tr.appendChild(td(String(i+1) + '.', 'c-lp'));
+      tr.appendChild(td(p.nazwa, ''));
+      tr.appendChild(td(p.ilosc !== '' ? ilosc(toNumber(p.ilosc)) + (p.jednostka ? ' ' + p.jednostka : '') : '', 'c-qty'));
+      tr.appendChild(td(p.cena !== '' ? kwota(toGrosze(p.cena), waluta) : '', 'c-price'));
+      tr.appendChild(td(kwota(w, waluta), 'c-val'));
+      tbody.appendChild(tr);
+    });
+
+    put('razem', kwota(razem, waluta));
+    put('slownie', kwotaSlownie(razem, waluta));
+
+    put('pForma', 'Forma płatności: ' + (u.forma || 'Przelew'));
+    put('pKonto', u.konto ? 'Numer konta: ' + u.konto : '');
+    put('pTytul', $('numer').value ? 'Tytuł przelewu: Rachunek nr ' + $('numer').value : '');
+
+    zapisz();
+  }
+
+  function td(tekst, klasa){
+    var el = document.createElement('td');
+    if(klasa) el.className = klasa;
+    el.textContent = tekst || '';
+    return el;
+  }
+
+  /* ============ Listy ============ */
+
+  function rysujKlientow(){
+    var ul = $('listaKlientow');
+    ul.textContent = '';
+    $('pustoKlienci').hidden = db.klienci.length > 0;
+
+    db.klienci.forEach(function(k, i){
+      var li = document.createElement('li');
+      var box = document.createElement('div');
+      var nazwa = document.createElement('strong');
+      nazwa.textContent = k.nazwa;
+      var meta = document.createElement('span');
+      meta.className = 'meta';
+      meta.textContent = [k.adres, k.nip && k.nip !== 'Brak' ? 'NIP ' + k.nip : '', k.kraj].filter(Boolean).join(' · ');
+      box.appendChild(nazwa);
+      box.appendChild(meta);
+      var del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'link';
+      del.textContent = 'Usuń';
+      del.addEventListener('click', function(){
+        if(!window.confirm('Usunąć klienta „' + k.nazwa + '"?')) return;
+        db.klienci.splice(i,1);
+        rysujKlientow();
+        rysujWyborKlienta();
+        zapisz();
+      });
+      li.appendChild(box);
+      li.appendChild(del);
+      ul.appendChild(li);
+    });
+  }
+
+  function rysujWyborKlienta(){
+    var sel = $('wyborKlienta');
+    var biezacy = sel.value;
+    sel.textContent = '';
+    var o0 = document.createElement('option');
+    o0.value = '';
+    o0.textContent = '— wpisz ręcznie poniżej —';
+    sel.appendChild(o0);
+    db.klienci.forEach(function(k, i){
+      var o = document.createElement('option');
+      o.value = String(i);
+      o.textContent = k.nazwa;
+      sel.appendChild(o);
+    });
+    if(biezacy && db.klienci[Number(biezacy)]) sel.value = biezacy;
+  }
+
+  function rysujUslugi(){
+    var ul = $('listaUslug');
+    ul.textContent = '';
+    $('pustoUslugi').hidden = db.uslugi.length > 0;
+
+    db.uslugi.forEach(function(u, i){
+      var li = document.createElement('li');
+      var box = document.createElement('div');
+      var nazwa = document.createElement('strong');
+      nazwa.textContent = u.nazwa;
+      var meta = document.createElement('span');
+      meta.className = 'meta';
+      meta.textContent = nf.format(toNumber(u.cena)) + ' / ' + u.jednostka;
+      box.appendChild(nazwa);
+      box.appendChild(meta);
+      var del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'link';
+      del.textContent = 'Usuń';
+      del.addEventListener('click', function(){
+        if(!window.confirm('Usunąć usługę „' + u.nazwa + '"?')) return;
+        db.uslugi.splice(i,1);
+        rysujUslugi();
+        rysujPozycje();
+        zapisz();
+      });
+      li.appendChild(box);
+      li.appendChild(del);
+      ul.appendChild(li);
+    });
+  }
+
+  function rysujRejestr(){
+    var box = $('rejestrBox');
+    box.textContent = '';
+    $('pustoRejestr').hidden = db.rejestr.length > 0;
+    if(!db.rejestr.length) return;
+
+    var tbl = document.createElement('table');
+    tbl.className = 'reg-table';
+    var thead = document.createElement('thead');
+    var trh = document.createElement('tr');
+    ['Numer','Data','Klient','Wartość','Status',''].forEach(function(h){
+      var th = document.createElement('th');
+      th.scope = 'col';
+      th.textContent = h;
+      trh.appendChild(th);
+    });
+    thead.appendChild(trh);
+    tbl.appendChild(thead);
+
+    var tbody = document.createElement('tbody');
+    db.rejestr.slice().reverse().forEach(function(r){
+      var realIndex = db.rejestr.indexOf(r);
+      var tr = document.createElement('tr');
+      tr.appendChild(td(r.numer,''));
+      tr.appendChild(td(dataPl(r.dataWystawienia),''));
+      tr.appendChild(td(r.klient,''));
+      tr.appendChild(td(kwota(r.wartoscGr, r.waluta),'num'));
+
+      var tdStatus = document.createElement('td');
+      var sel = document.createElement('select');
+      ['Oczekuje na wpłatę','Opłacony'].forEach(function(s){
+        var o = document.createElement('option');
+        o.value = s;
+        o.textContent = s;
+        sel.appendChild(o);
+      });
+      sel.value = r.status;
+      sel.addEventListener('change', function(){
+        db.rejestr[realIndex].status = sel.value;
+        zapisz();
+      });
+      tdStatus.appendChild(sel);
+      tr.appendChild(tdStatus);
+
+      var tdDel = document.createElement('td');
+      var del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'link';
+      del.textContent = 'Usuń';
+      del.addEventListener('click', function(){
+        if(!window.confirm('Usunąć wpis ' + r.numer + ' z rejestru?')) return;
+        db.rejestr.splice(realIndex,1);
+        rysujRejestr();
+        zapisz();
+      });
+      tdDel.appendChild(del);
+      tr.appendChild(tdDel);
+
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);
+    box.appendChild(tbl);
+  }
+
+  /* ============ Zakładki ============ */
+
+  var taby = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+
+  taby.forEach(function(t){
+    t.addEventListener('click', function(){ pokazTab(t); });
+    t.addEventListener('keydown', function(e){
+      var i = taby.indexOf(t);
+      var next = null;
+      if(e.key === 'ArrowRight') next = taby[(i+1) % taby.length];
+      if(e.key === 'ArrowLeft')  next = taby[(i-1+taby.length) % taby.length];
+      if(next){ e.preventDefault(); next.focus(); pokazTab(next); }
+    });
   });
 
-  document.getElementById('btnClear').addEventListener('click', function(){
-    if(!window.confirm('Wyczyścić wszystkie pola, także dane zleceniodawcy i wykonawcy?')) return;
-    form.reset();
-    try{ localStorage.removeItem(STORE_KEY); }catch(e){}
-    setDefaults();
+  function pokazTab(tab){
+    taby.forEach(function(t){
+      var wybrany = (t === tab);
+      t.setAttribute('aria-selected', wybrany ? 'true' : 'false');
+      t.tabIndex = wybrany ? 0 : -1;
+      $(t.getAttribute('aria-controls')).hidden = !wybrany;
+    });
+  }
+
+  /* ============ Akcje ============ */
+
+  $('btnDodajPozycje').addEventListener('click', function(){
+    pozycje.push(nowaPozycja());
+    rysujPozycje();
     render();
   });
 
-  form.addEventListener('input', render);
-  form.addEventListener('change', render);
+  $('wyborKlienta').addEventListener('change', function(){
+    var k = db.klienci[Number(this.value)];
+    if(!k) return;
+    $('klientNazwa').value = k.nazwa;
+    $('klientAdres').value = k.adres;
+    $('klientNip').value = k.nip === 'Brak' ? '' : k.nip;
+    $('klientKraj').value = k.kraj;
+    $('waluta').value = KRAJ_WALUTA[String(k.kraj).toUpperCase()] || 'EUR';
+    render();
+  });
 
-  if(!load()) setDefaults();
+  $('dataWystawienia').addEventListener('change', function(){
+    if(!$('dataWykonania').value) $('dataWykonania').value = this.value;
+    $('terminPlatnosci').value = plusDni(this.value, db.ustawienia.terminDni);
+    render();
+  });
+
+  $('btnDodajKlienta').addEventListener('click', function(){
+    var nazwa = $('nkNazwa').value.trim();
+    if(!nazwa){ $('nkNazwa').focus(); return; }
+    db.klienci.push({
+      nazwa: nazwa,
+      adres: $('nkAdres').value.trim(),
+      nip: $('nkNip').value.trim() || 'Brak',
+      kraj: $('nkKraj').value.trim() || 'PL'
+    });
+    $('nkNazwa').value = ''; $('nkAdres').value = ''; $('nkNip').value = ''; $('nkKraj').value = 'PL';
+    rysujKlientow();
+    rysujWyborKlienta();
+    zapisz();
+  });
+
+  $('btnDodajUsluge').addEventListener('click', function(){
+    var nazwa = $('nuNazwa').value.trim();
+    if(!nazwa){ $('nuNazwa').focus(); return; }
+    db.uslugi.push({
+      nazwa: nazwa,
+      cena: toNumber($('nuCena').value),
+      jednostka: $('nuJednostka').value.trim() || 'szt.'
+    });
+    $('nuNazwa').value = ''; $('nuCena').value = ''; $('nuJednostka').value = 'szt.';
+    rysujUslugi();
+    rysujPozycje();
+    zapisz();
+  });
+
+  $('btnDrukuj').addEventListener('click', function(){ window.print(); });
+
+  $('btnWystaw').addEventListener('click', function(){
+    var numer = $('numer').value.trim();
+    if(!numer){ komunikat($('msgRachunek'), 'Podaj numer rachunku.', 'warn'); return; }
+    if(db.rejestr.some(function(r){ return r.numer === numer; })){
+      komunikat($('msgRachunek'), 'Rachunek ' + numer + ' jest już w rejestrze.', 'warn');
+      return;
+    }
+    var razem = pozycje.reduce(function(s,p){ return s + wartoscPozycji(p); }, 0);
+    db.rejestr.push({
+      numer: numer,
+      dataWystawienia: $('dataWystawienia').value,
+      dataWykonania: $('dataWykonania').value,
+      terminPlatnosci: $('terminPlatnosci').value,
+      klient: $('klientNazwa').value,
+      opis: pozycje.map(function(p){ return p.nazwa; }).filter(Boolean).join('; '),
+      wartoscGr: razem,
+      waluta: $('waluta').value,
+      status: 'Oczekuje na wpłatę'
+    });
+    rysujRejestr();
+    zapisz();
+    komunikat($('msgRachunek'), 'Zapisano ' + numer + ' w rejestrze.', 'ok');
+  });
+
+  $('btnNowy').addEventListener('click', function(){
+    var rok = new Date($('dataWystawienia').value || dzis()).getFullYear() || new Date().getFullYear();
+    $('numer').value = nastepnyNumer(rok);
+    $('dataWystawienia').value = dzis();
+    $('dataWykonania').value = dzis();
+    $('terminPlatnosci').value = plusDni(dzis(), db.ustawienia.terminDni);
+    $('wyborKlienta').value = '';
+    $('klientNazwa').value = ''; $('klientAdres').value = ''; $('klientNip').value = ''; $('klientKraj').value = '';
+    pozycje = [nowaPozycja()];
+    rysujPozycje();
+    render();
+  });
+
+  $('btnCsv').addEventListener('click', function(){
+    var wiersze = [['Numer','Data wystawienia','Klient','Usługa','Wartość','Waluta','Status','Data wykonania','Termin płatności']];
+    db.rejestr.forEach(function(r){
+      wiersze.push([r.numer, r.dataWystawienia, r.klient, r.opis,
+        (r.wartoscGr/100).toFixed(2).replace('.',','), r.waluta, r.status,
+        r.dataWykonania, r.terminPlatnosci]);
+    });
+    var csv = wiersze.map(function(w){
+      return w.map(function(c){ return '"' + String(c === undefined ? '' : c).replace(/"/g,'""') + '"'; }).join(';');
+    }).join('\r\n');
+    pobierz('﻿' + csv, 'rejestr-rachunkow.csv', 'text/csv;charset=utf-8');
+  });
+
+  $('btnEksport').addEventListener('click', function(){
+    pobierz(JSON.stringify(db, null, 2), 'kopia-generator-rachunkow.json', 'application/json');
+  });
+
+  $('btnImport').addEventListener('click', function(){ $('plikImport').click(); });
+
+  $('plikImport').addEventListener('change', function(){
+    var plik = this.files && this.files[0];
+    if(!plik) return;
+    var fr = new FileReader();
+    fr.onload = function(){
+      try{
+        var dane = JSON.parse(String(fr.result));
+        if(!dane || typeof dane !== 'object') throw new Error('zły format');
+        db.ustawienia = Object.assign(db.ustawienia, dane.ustawienia || {});
+        db.klienci = Array.isArray(dane.klienci) ? dane.klienci : [];
+        db.uslugi  = Array.isArray(dane.uslugi)  ? dane.uslugi  : [];
+        db.rejestr = Array.isArray(dane.rejestr) ? dane.rejestr : [];
+        wczytajUstawieniaDoPol();
+        rysujKlientow(); rysujWyborKlienta(); rysujUslugi(); rysujRejestr(); rysujPozycje();
+        render();
+        komunikat($('msgStorage'), 'Wczytano kopię.', 'ok');
+      }catch(e){
+        komunikat($('msgStorage'), 'Nie udało się wczytać pliku — czy to na pewno kopia z tego generatora?', 'warn');
+      }
+    };
+    fr.readAsText(plik);
+    this.value = '';
+  });
+
+  function pobierz(tresc, nazwa, typ){
+    var blob = new Blob([tresc], {type: typ});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = nazwa;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+
+  /* ============ Ustawienia ============ */
+
+  var polaUstawien = {
+    imie:'sprzImie', ulica:'sprzUlica', miasto:'sprzMiasto', kontakt:'sprzKontakt',
+    forma:'sprzForma', konto:'sprzKonto', terminDni:'sprzTermin'
+  };
+
+  Object.keys(polaUstawien).forEach(function(k){
+    $(polaUstawien[k]).addEventListener('input', function(){
+      db.ustawienia[k] = (k === 'terminDni') ? Number(this.value || 0) : this.value;
+      render();
+    });
+  });
+
+  function wczytajUstawieniaDoPol(){
+    Object.keys(polaUstawien).forEach(function(k){
+      $(polaUstawien[k]).value = db.ustawienia[k] === undefined ? '' : db.ustawienia[k];
+    });
+  }
+
+  ['numer','waluta','dataWystawienia','dataWykonania','terminPlatnosci',
+   'klientNazwa','klientAdres','klientNip','klientKraj'].forEach(function(id){
+    $(id).addEventListener('input', render);
+    $(id).addEventListener('change', render);
+  });
+
+  /* ============ Start ============ */
+
+  var zapisane = odczytaj();
+
+  if(zapisane && zapisane.db){
+    db.ustawienia = Object.assign(db.ustawienia, zapisane.db.ustawienia || {});
+    db.klienci = zapisane.db.klienci || [];
+    db.uslugi  = zapisane.db.uslugi  || [];
+    db.rejestr = zapisane.db.rejestr || [];
+    pozycje = (zapisane.pozycje && zapisane.pozycje.length) ? zapisane.pozycje : [nowaPozycja()];
+    var r = zapisane.rachunek || {};
+    Object.keys(r).forEach(function(id){ if($(id)) $(id).value = r[id]; });
+  } else {
+    pozycje = [nowaPozycja()];
+  }
+
+  wczytajUstawieniaDoPol();
+
+  if(!$('dataWystawienia').value) $('dataWystawienia').value = dzis();
+  if(!$('dataWykonania').value)   $('dataWykonania').value = dzis();
+  if(!$('terminPlatnosci').value) $('terminPlatnosci').value = plusDni(dzis(), db.ustawienia.terminDni);
+  if(!$('numer').value)           $('numer').value = nastepnyNumer(new Date().getFullYear());
+
+  taby.forEach(function(t, i){ t.tabIndex = i === 0 ? 0 : -1; });
+
+  rysujKlientow();
+  rysujWyborKlienta();
+  rysujUslugi();
+  rysujRejestr();
+  rysujPozycje();
   render();
 })();
 </script>
