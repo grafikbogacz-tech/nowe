@@ -31,8 +31,29 @@ PL → PLN, UK → GBP, pozostałe kraje → EUR.
 **Rejestr** — wystawione rachunki ze statusem „Oczekuje na wpłatę" / „Opłacony".
 Eksport do CSV otwiera się w Excelu.
 
-**Moje dane** — dane sprzedawcy, konto, domyślny termin płatności
-oraz kopia zapasowa wszystkich danych do pliku `.json`.
+**Moje dane** — dane sprzedawcy, konto, domyślny termin płatności,
+wymiana danych z Excelem oraz kopia zapasowa do pliku `.json`.
+
+## Baza w Excelu
+
+Generator czyta i zapisuje `Baza_i_Generator_Rachunkow_ClickUp.xlsx` —
+arkusze **Ustawienia**, **Klienci**, **Usługi** i **Baza Rachunków**.
+
+- **Wczytaj z Excela** — wskazujesz plik, generator zaciąga z niego wszystko.
+- **Zapisz do Excela** — pobiera plik o tej samej nazwie; nadpisujesz nim stary.
+
+Czego **nie** da się zrobić: automatycznego zapisu do pliku na dysku w tle.
+Strona otwarta w przeglądarce nie ma prawa nadpisywać plików bez Twojego udziału
+— to zabezpieczenie przeglądarki, nie uproszczenie. Skrypt Pythona mógł to robić,
+bo działał poza przeglądarką. Tutaj wymiana jest dwuklikowa i świadoma.
+
+Zapis tworzy plik od nowa, więc **nie zachowuje formatowania** — szerokości kolumn,
+kolorów ani filtrów. Zachowuje nazwy arkuszy, nagłówki, kolejność kolumn i dane.
+Jeśli zależy Ci na wyglądzie arkusza, trzymaj go jako plik główny i używaj tylko
+kierunku „Wczytaj z Excela".
+
+Kolejność kolumn ma znaczenie — generator czyta je po pozycji, nie po nazwie.
+Nie usuwaj wiersza nagłówka.
 
 ## Co się zmieniło względem starej wersji
 
@@ -42,7 +63,8 @@ oraz kopia zapasowa wszystkich danych do pliku `.json`.
   `Czterysta sześćdziesiąt 00/100`, bez słowa „złotych". Teraz jest poprawnie,
   z odmianą dla PLN, GBP i EUR.
 - **PDF od razu**, bez pośredniego kroku Word → PDF.
-- **Excel nie musi być zamknięty** — bo nie ma Excela w obiegu.
+- **Excel nie musi być zamknięty** podczas wystawiania rachunku. Stara wersja
+  przerywała pracę błędem, jeśli plik był otwarty.
 
 ## Dane i kopia zapasowa
 
